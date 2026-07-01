@@ -1026,3 +1026,179 @@ main {
 .admin-content {
     padding: 2rem;
 }
+
+/* Premium Global Table Styles */
+.table {
+    color: var(--text-primary) !important;
+    border-color: var(--border) !important;
+}
+
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary) !important;
+    border-bottom-width: 1px !important;
+    padding: 1rem 1.5rem;
+    background-color: var(--surface-card) !important;
+}
+
+.table td {
+    padding: 1rem 1.5rem;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid var(--border) !important;
+    background-color: var(--surface-card) !important;
+}
+
+.table tbody tr {
+    transition: background-color var(--transition-fast);
+}
+
+.table-hover tbody tr:hover td {
+    background-color: var(--surface-card-hover) !important;
+}
+
+.table-responsive {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--surface-card);
+}
+
+/* Premium Soft Badge Styling */
+.badge {
+    font-weight: 600;
+    padding: 0.4em 0.7em;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    letter-spacing: 0.03em;
+}
+
+.badge.bg-success {
+    background-color: var(--success-soft) !important;
+    color: var(--success) !important;
+    border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.badge.bg-danger {
+    background-color: var(--danger-soft) !important;
+    color: var(--danger) !important;
+    border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.badge.bg-warning {
+    background-color: var(--warning-soft) !important;
+    color: var(--warning) !important;
+    border: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+.badge.bg-info {
+    background-color: var(--info-soft) !important;
+    color: var(--info) !important;
+    border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+.badge.bg-primary {
+    background-color: var(--accent-soft) !important;
+    color: var(--accent) !important;
+    border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.badge.bg-secondary {
+    background-color: rgba(148, 163, 184, 0.1) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .badge.bg-success {
+    background-color: var(--success-soft) !important;
+    color: var(--success) !important;
+    border: 1px solid rgba(52, 211, 153, 0.15);
+}
+
+[data-theme="dark"] .badge.bg-danger {
+    background-color: var(--danger-soft) !important;
+    color: var(--danger) !important;
+    border: 1px solid rgba(248, 113, 113, 0.15);
+}
+
+[data-theme="dark"] .badge.bg-warning {
+    background-color: var(--warning-soft) !important;
+    color: var(--warning) !important;
+    border: 1px solid rgba(251, 191, 36, 0.15);
+}
+
+[data-theme="dark"] .badge.bg-info {
+    background-color: var(--info-soft) !important;
+    color: var(--info) !important;
+    border: 1px solid rgba(96, 165, 250, 0.15);
+}
+
+[data-theme="dark"] .badge.bg-primary {
+    background-color: var(--accent-soft) !important;
+    color: var(--accent) !important;
+    border: 1px solid rgba(129, 140, 248, 0.15);
+}
+
+/* Skeleton Loaders */
+.skeleton {
+    background: linear-gradient(90deg, var(--border) 25%, var(--surface-card-hover) 37%, var(--border) 63%);
+    background-size: 400% 100%;
+    animation: skeleton-loading 1.4s ease infinite;
+    border-radius: var(--radius-sm);
+    display: inline-block;
+    height: 1.25rem;
+    width: 100%;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Premium Empty States */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin: 2rem 0;
+}
+
+.empty-state-icon {
+    width: 72px;
+    height: 72px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.empty-state-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    max-width: 360px;
+    margin-bottom: 1.5rem;
+}

@@ -84,15 +84,15 @@
     {% else %}
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-sm text-center p-5">
-                <i class="fas fa-calendar-alt fa-3x text-muted opacity-50 mb-3"></i>
-                <h5 class="fw-bold text-muted mb-2">No events yet</h5>
-                <p class="text-secondary small mb-4">Create your first event to isolate budgets for specific time periods.</p>
-                <div class="d-flex justify-content-center">
-                    <button class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#addEventModal">
-                        <i class="fas fa-plus me-2"></i>Create Event
-                    </button>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-calendar-alt"></i>
                 </div>
+                <h5 class="empty-state-title">No events yet</h5>
+                <p class="empty-state-description">Create your first event to isolate budgets for specific time periods.</p>
+                <button class="btn btn-primary fw-bold mt-2" data-bs-toggle="modal" data-bs-target="#addEventModal">
+                    <i class="fas fa-plus me-2"></i>Create Event
+                </button>
             </div>
         </div>
     </div>

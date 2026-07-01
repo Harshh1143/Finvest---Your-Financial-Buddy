@@ -23,32 +23,49 @@ function updateToggleIcon() {
 if (toggle) {
     toggle.addEventListener("click", () => {
         const theme = document.body.getAttribute("data-theme");
+        let nextTheme = "light";
         if (theme === "dark") {
             document.body.removeAttribute("data-theme");
             localStorage.setItem("theme", "light");
+            nextTheme = "light";
         } else {
             document.body.setAttribute("data-theme", "dark");
             localStorage.setItem("theme", "dark");
+            nextTheme = "dark";
         }
+        document.cookie = "theme=" + nextTheme + "; path=/; max-age=31536000; SameSite=Lax";
         updateToggleIcon();
+        
+        // Refresh charts on theme switch to ensure visual consistency
+        if (document.querySelector('img[alt*="Chart"]') || document.querySelector('img[alt*="Trend"]') || document.querySelector('img[alt*="Allocation"]')) {
+            setTimeout(() => {
+                window.location.reload();
+            }, 100);
+        }
     });
 }
 
 // Load saved theme on load
 const applySavedTheme = () => {
     const savedTheme = localStorage.getItem("theme");
+    let activeTheme = "light";
     if (savedTheme === "dark") {
         document.body.setAttribute("data-theme", "dark");
+        activeTheme = "dark";
     } else if (savedTheme === "light") {
         document.body.removeAttribute("data-theme");
+        activeTheme = "light";
     } else {
         // System preference default
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.body.setAttribute("data-theme", "dark");
+            activeTheme = "dark";
         } else {
             document.body.removeAttribute("data-theme");
+            activeTheme = "light";
         }
     }
+    document.cookie = "theme=" + activeTheme + "; path=/; max-age=31536000; SameSite=Lax";
     updateToggleIcon();
 };
 

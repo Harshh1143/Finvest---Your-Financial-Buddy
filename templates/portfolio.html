@@ -157,12 +157,15 @@
         </div>
         {% else %}
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center py-5">
-                    <i class="fas fa-chart-pie fa-3x text-muted opacity-50 mb-3"></i>
-                    <h5 class="fw-bold text-muted mb-2">No Assets Yet</h5>
-                    <p class="text-muted mb-0">Start building your portfolio by adding your first asset.</p>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-briefcase"></i>
                 </div>
+                <h5 class="empty-state-title">No Assets Yet</h5>
+                <p class="empty-state-description">Start building your portfolio by adding your first asset.</p>
+                <button type="button" class="btn btn-primary fw-bold mt-2" data-bs-toggle="modal" data-bs-target="#addAssetModal">
+                    <i class="fas fa-plus me-2"></i>Add Asset
+                </button>
             </div>
         </div>
         {% endfor %}
@@ -182,7 +185,13 @@
                     {% if growth_chart %}
                         <img src="{{ growth_chart }}" alt="Portfolio Growth" class="img-fluid chart-image rounded" style="max-height: 350px;">
                     {% else %}
-                        <p class="text-center text-muted py-5">No growth data available yet. Add assets and update prices.</p>
+                        <div class="empty-state border-0 my-0 shadow-none">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-chart-area"></i>
+                            </div>
+                            <h5 class="empty-state-title">No growth data</h5>
+                            <p class="empty-state-description mb-0">Add assets and update prices to see portfolio growth.</p>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -200,7 +209,13 @@
                     {% if allocation_chart %}
                         <img src="{{ allocation_chart }}" alt="Asset Allocation" class="img-fluid chart-image rounded" style="max-height: 350px;">
                     {% else %}
-                        <p class="text-center text-muted py-5">No allocation data available.</p>
+                        <div class="empty-state border-0 my-0 shadow-none">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <h5 class="empty-state-title">No allocation data</h5>
+                            <p class="empty-state-description mb-0">Add assets to view your portfolio distribution.</p>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -231,7 +246,13 @@
                         </div>
                         {% endfor %}
                     {% else %}
-                        <p class="text-center text-muted py-4 mb-0">No alerts or signals at this time.</p>
+                        <div class="empty-state border-0 my-0 shadow-none">
+                            <div class="empty-state-icon" style="background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); width: 50px; height: 50px; border-radius: 50px; font-size: 1.25rem;">
+                                <i class="fas fa-bell-slash"></i>
+                            </div>
+                            <h6 class="empty-state-title fs-6">All clear</h6>
+                            <p class="empty-state-description small mb-0">No alerts or signals at this time.</p>
+                        </div>
                     {% endif %}
                 </div>
             </div>

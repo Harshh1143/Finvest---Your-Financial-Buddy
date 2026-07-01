@@ -23,8 +23,9 @@ def index():
 
     # Generate charts
     history_data = Portfolio.get_portfolio_history(user_id, 30)
-    growth_chart = ChartGenerator.generate_portfolio_growth_chart(history_data)
-    allocation_chart = ChartGenerator.generate_asset_allocation_chart(assets)
+    dark_mode = request.cookies.get('theme') == 'dark'
+    growth_chart = ChartGenerator.generate_portfolio_growth_chart(history_data, dark_mode=dark_mode)
+    allocation_chart = ChartGenerator.generate_asset_allocation_chart(assets, dark_mode=dark_mode)
 
     return render_template('portfolio.html',
                          assets=assets,

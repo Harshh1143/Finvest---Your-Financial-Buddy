@@ -112,9 +112,12 @@
                         </table>
                     </div>
                     {% else %}
-                    <div class="text-center py-5">
-                        <i class="fas fa-inbox fa-3x text-muted opacity-50 mb-3"></i>
-                        <p class="text-muted small">No expense data available for the last 30 days</p>
+                    <div class="empty-state border-0 my-0 shadow-none">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <h5 class="empty-state-title">No expense data</h5>
+                        <p class="empty-state-description mb-0">No expense data available for the last 30 days.</p>
                     </div>
                     {% endif %}
                 </div>

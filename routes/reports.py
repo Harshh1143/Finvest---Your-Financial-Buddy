@@ -79,10 +79,11 @@ def index():
     month_summary = dict(sorted(month_summary.items()))
 
     # Generate charts
-    expense_chart = ChartGenerator.generate_expense_pie_chart(category_summary, dark_mode=False)
-    income_chart = ChartGenerator.generate_income_bar_chart(category_summary, dark_mode=False)
-    monthly_chart = ChartGenerator.generate_monthly_trend_chart(month_summary, dark_mode=False)
-    cash_flow_chart = ChartGenerator.generate_cash_flow_chart(month_summary, dark_mode=False)
+    dark_mode = request.cookies.get('theme') == 'dark'
+    expense_chart = ChartGenerator.generate_expense_pie_chart(category_summary, dark_mode=dark_mode)
+    income_chart = ChartGenerator.generate_income_bar_chart(category_summary, dark_mode=dark_mode)
+    monthly_chart = ChartGenerator.generate_monthly_trend_chart(month_summary, dark_mode=dark_mode)
+    cash_flow_chart = ChartGenerator.generate_cash_flow_chart(month_summary, dark_mode=dark_mode)
 
     return render_template('reports.html',
                          date_from=date_from,

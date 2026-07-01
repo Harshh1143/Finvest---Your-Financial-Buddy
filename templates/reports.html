@@ -48,6 +48,7 @@
         </div>
     </div>
 
+    {% if category_summary %}
     <!-- Summary Cards Section -->
     <div class="row mb-5">
         {{ components.metric_card('Total Income', '₹' ~ "%.2f"|format(total_income), 'fas fa-arrow-down', 'income', 'success') }}
@@ -234,19 +235,18 @@
             </div>
         </div>
     </div>
-
-    <!-- No Data Message -->
-    {% if not category_summary %}
-    <div class="row mt-5">
+    {% else %}
+    <div class="row mt-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center py-5">
-                    <div class="mb-3">
-                        <i class="fas fa-inbox fa-3x text-muted opacity-50"></i>
-                    </div>
-                    <h4 class="fw-bold text-muted mb-2">No Data Available</h4>
-                    <p class="text-secondary mb-0">No transactions found for the selected period. Add some transactions to see your financial reports.</p>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-inbox"></i>
                 </div>
+                <h5 class="empty-state-title">No Data Available</h5>
+                <p class="empty-state-description">No transactions found for the selected period. Add some transactions to see your financial reports.</p>
+                <a href="{{ url_for('tracker.index') }}" class="btn btn-primary fw-bold mt-2">
+                    <i class="fas fa-plus me-2"></i>Add Transaction
+                </a>
             </div>
         </div>
     </div>
