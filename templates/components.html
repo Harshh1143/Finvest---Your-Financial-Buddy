@@ -1,0 +1,67 @@
+{# Jinja2 Reusable Component Library for FinVest #}
+
+{% macro section_header(title, subtitle=none, icon=none) %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="display-6 fw-bold mb-1" style="font-family: var(--font-display); letter-spacing: -0.03em;">
+            {% if icon %}<i class="{{ icon }} text-primary opacity-75 me-2"></i>{% endif %}{{ title }}
+        </h1>
+        {% if subtitle %}
+            <p class="text-muted mb-0" style="font-size: 1rem; font-style: italic;">{{ subtitle }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{% macro quick_action(url, icon_class, title, subtitle, icon_color='primary') %}
+<div class="col-md-6 col-lg-3 mb-3">
+    <a href="{{ url }}" class="text-decoration-none">
+        <div class="card h-100 border-0 shadow-sm metric-card">
+            <div class="card-body text-center d-flex flex-column align-items-center justify-content-center py-4">
+                <div class="icon-wrapper mb-3 text-{{ icon_color }}" style="background: var(--{{ icon_color }}-soft); width: 56px; height: 56px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                    <i class="{{ icon_class }}"></i>
+                </div>
+                <h6 class="card-title fw-bold text-primary mb-1">{{ title }}</h6>
+                <p class="text-secondary small mb-0">{{ subtitle }}</p>
+            </div>
+        </div>
+    </a>
+</div>
+{% endmacro %}
+
+{% macro metric_card(label, value, icon_class, type_class='balance', text_color='primary') %}
+<div class="col-md-4 mb-3">
+    <div class="metric-card shadow-sm h-100">
+        <div class="icon-wrapper {{ type_class }}">
+            <i class="{{ icon_class }}"></i>
+        </div>
+        <div>
+            <div class="metric-label">{{ label }}</div>
+            <div class="metric-value text-{{ text_color }}">{{ value }}</div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro badge(text, type='primary') %}
+<span class="badge bg-{{ type }}">{{ text }}</span>
+{% endmacro %}
+
+{% macro form_field(id, label, type='text', value='', placeholder='', required=true, options=none, name=none) %}
+{% set input_name = name if name is not none else id %}
+<div class="mb-3">
+    <label for="{{ id }}" class="form-label">{{ label }}</label>
+    {% if type == 'select' %}
+        <select class="form-select" id="{{ id }}" name="{{ input_name }}" {% if required %}required{% endif %}>
+            {% if placeholder %}
+                <option value="" disabled {% if not value %}selected{% endif %}>{{ placeholder }}</option>
+            {% endif %}
+            {% for opt_val, opt_label in options %}
+                <option value="{{ opt_val }}" {% if value|string == opt_val|string %}selected{% endif %}>{{ opt_label }}</option>
+            {% endfor %}
+        </select>
+    {% else %}
+        <input type="{{ type }}" class="form-control" id="{{ id }}" name="{{ input_name }}" value="{{ value }}" placeholder="{{ placeholder }}" {% if required %}required{% endif %}>
+    {% endif %}
+</div>
+{% endmacro %}

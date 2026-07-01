@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "components.html" as components %}
 
 {% block nav %}
 <nav class="navbar navbar-expand-lg fintech-navbar shadow-sm">
@@ -21,110 +22,79 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="auth-hero">
-    <div class="row min-vh-100">
-        <!-- Left Column: Logo and Quote -->
-        <div class="col-lg-6 d-flex justify-content-center align-items-center py-5 py-lg-0">
-            <div class="brand-logo text-center">
-                <div class="logo-container mb-4">
-                    <h1 class="fw-bold display-1 mb-2 animate-title">FinVest</h1>
+<section class="auth-hero d-flex align-items-center justify-content-center py-5">
+    <div class="container">
+        <div class="row align-items-center justify-content-center g-5">
+            <!-- Left Column: Logo and Quote -->
+            <div class="col-lg-6 text-center text-lg-start d-flex flex-column justify-content-center">
+                <div class="brand-logo mb-4">
+                    <h1 class="fw-bold display-1 mb-2 animate-title" style="font-family: var(--font-display); letter-spacing: -0.03em;">FinVest</h1>
                 </div>
                 <div class="quote-section">
-                    <p class="mb-0 text-muted fs-4 fw-light">"Take control of your financial future with FinVest's
-                        intelligent tools and real-time insights."</p>
+                    <p class="mb-0 text-secondary fs-4 fw-light" style="line-height: 1.6;">"Take control of your financial future with FinVest's intelligent tools and real-time insights."</p>
+                    <div class="mt-4 pt-4 border-top opacity-25">
+                        <small class="text-secondary text-uppercase tracking-widest fw-bold">Financial Intelligence Platform</small>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Right Column: Form -->
-        <div class="col-lg-6 d-flex justify-content-center align-items-center py-5 py-lg-0">
-            <div class="auth-form-container" style="width: 100%; max-width: 420px;">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-5">
-                        <div class="text-center mb-5">
-                            <h3 class="fw-bold mb-2">Create Account</h3>
-                            <p class="text-muted small">Join FinVest to start managing your finances</p>
-                        </div>
-
-                        <form method="POST" class="auth-form needs-validation" novalidate>
-                            <div class="mb-4">
-                                <label for="name" class="form-label fw-bold small">Full Name</label>
-                                <div class="input-group input-group-lg">
-                                    <span class="input-group-text border-0 reports-input bg-transparent">
-                                        <i class="fas fa-user text-muted"></i>
-                                    </span>
-                                    <input type="text" class="form-control border-0 reports-input ps-2" id="name"
-                                        name="name" placeholder="" required>
-                                    <div class="invalid-feedback">
-                                        <i class="fas fa-exclamation-circle me-1"></i>Please tell us your full name.
-                                    </div>
-                                </div>
+            <!-- Right Column: Form -->
+            <div class="col-lg-6 d-flex justify-content-center">
+                <div class="auth-form-container w-100" style="max-width: 440px;">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4 p-md-5">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold mb-2">Create Account</h3>
+                                <p class="text-secondary small">Join FinVest to start managing your finances</p>
                             </div>
 
-                            <div class="mb-4">
-                                <label for="email" class="form-label fw-bold small">Email Address</label>
-                                <div class="input-group input-group-lg">
-                                    <span class="input-group-text border-0 reports-input bg-transparent">
-                                        <i class="fas fa-envelope text-muted"></i>
-                                    </span>
-                                    <input type="email" class="form-control border-0 reports-input ps-2" id="email"
-                                        name="email" placeholder="" required>
+                            <form method="POST" class="auth-form needs-validation" novalidate>
+                                <div class="mb-3">
+                                    {{ components.form_field('name', 'Full Name', required=true, placeholder='John Doe') }}
                                     <div class="invalid-feedback">
-                                        <i class="fas fa-exclamation-circle me-1"></i>Please enter a valid email address
-                                        so we can reach you.
+                                        <i class="fas fa-exclamation-circle me-1"></i>Please enter your full name.
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="mb-4">
-                                <label for="password" class="form-label fw-bold small">Password</label>
-                                <div class="input-group input-group-lg">
-                                    <span class="input-group-text border-0 reports-input bg-transparent">
-                                        <i class="fas fa-lock text-muted"></i>
-                                    </span>
-                                    <input type="password" class="form-control border-0 reports-input ps-2"
-                                        id="password" name="password" placeholder="" required>
-                                    <button class="btn btn-outline-light border-0 reports-input text-muted"
-                                        type="button" id="togglePassword" title="Show/Hide">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                <div class="mb-3">
+                                    {{ components.form_field('email', 'Email Address', type='email', required=true, placeholder='name@example.com') }}
                                     <div class="invalid-feedback">
-                                        <i class="fas fa-exclamation-circle me-1"></i>Please choose a password with at
-                                        least 6 characters.
+                                        <i class="fas fa-exclamation-circle me-1"></i>Please enter a valid email address.
                                     </div>
                                 </div>
-                                <small class="text-muted d-block mt-2">Min 6 characters, use mix of letters &
-                                    numbers</small>
-                            </div>
 
-                            <div class="mb-4">
-                                <label for="confirm_password" class="form-label fw-bold small">Confirm Password</label>
-                                <div class="input-group input-group-lg">
-                                    <span class="input-group-text border-0 reports-input bg-transparent">
-                                        <i class="fas fa-lock text-muted"></i>
-                                    </span>
-                                    <input type="password" class="form-control border-0 reports-input ps-2"
-                                        id="confirm_password" name="confirm_password" placeholder="" required>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label small fw-bold text-secondary mb-1">Password</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control border-0 bg-light p-3" id="password" name="password" required style="border-radius: var(--radius-md) 0 0 var(--radius-md); font-size: 0.95rem; height: 58px;">
+                                        <button class="btn btn-light border-0 px-3" type="button" id="togglePassword" title="Show/Hide" style="border-radius: 0 var(--radius-md) var(--radius-md) 0; height: 58px;">
+                                            <i class="fas fa-eye text-muted"></i>
+                                        </button>
+                                        <div class="invalid-feedback">
+                                            <i class="fas fa-exclamation-circle me-1"></i>Please choose a password.
+                                        </div>
+                                    </div>
+                                    <small class="text-secondary d-block mt-2" style="font-size: 0.8rem;">Min 6 characters, use a mix of letters & numbers</small>
+                                </div>
+
+                                <div class="mb-4">
+                                    {{ components.form_field('confirm_password', 'Confirm Password', type='password', required=true, placeholder='Confirm your password') }}
                                     <div class="invalid-feedback">
-                                        <i class="fas fa-exclamation-circle me-1"></i>Please retype your password to
-                                        confirm.
+                                        <i class="fas fa-exclamation-circle me-1"></i>Please confirm your password.
                                     </div>
                                 </div>
+
+                                <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold mb-4 py-3">
+                                    <i class="fas fa-user-plus me-2"></i>Create Account
+                                </button>
+                            </form>
+
+                            <div class="text-center border-top pt-4">
+                                <p class="mb-0 small text-secondary">
+                                    Already have an account?
+                                    <a href="{{ url_for('auth.login') }}" class="fw-bold text-decoration-none text-primary">Sign in here</a>
+                                </p>
                             </div>
-
-                            <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold mb-4"
-                                style="border: none;">
-                                <i class="fas fa-user-plus me-2"></i>Create Account
-                            </button>
-                        </form>
-
-                        <div class="text-center border-top pt-4">
-                            <p class="mb-0 small text-muted">
-                                Already have an account?
-                                <a href="{{ url_for('auth.login') }}" class="fw-bold text-decoration-none"
-                                    style="color: #667eea;">Sign
-                                    in here</a>
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -132,49 +102,9 @@
         </div>
     </div>
 </section>
+{% endblock %}
 
-<!-- Dark Mode Styles -->
-<style>
-    [data-theme="dark"] .card {
-        background: linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(25, 25, 25, 0.9) 100%) !important;
-        color: #e0e0e0;
-    }
-
-    [data-theme="dark"] .form-label {
-        color: #e0e0e0;
-    }
-
-    [data-theme="dark"] .form-control,
-    [data-theme="dark"] .input-group-text {
-        background: rgba(255, 255, 255, 0.05) !important;
-        color: #e0e0e0 !important;
-        border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-
-    [data-theme="dark"] .form-control::placeholder {
-        color: rgba(255, 255, 255, 0.4);
-    }
-
-    [data-theme="dark"] .form-control:focus {
-        background: rgba(255, 255, 255, 0.08) !important;
-        color: #e0e0e0 !important;
-        border-color: #10b981 !important;
-        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25) !important;
-    }
-
-    [data-theme="dark"] .text-muted {
-        color: rgba(255, 255, 255, 0.6) !important;
-    }
-
-    [data-theme="dark"] [style*="background: rgba(102, 126, 234"] {
-        background: rgba(102, 126, 234, 0.15) !important;
-    }
-
-    .auth-hero {
-        min-height: 100vh;
-    }
-</style>
-
+{% block scripts %}
 <script>
     // Password toggle functionality
     document.getElementById('togglePassword').addEventListener('click', function () {

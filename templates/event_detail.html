@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "components.html" as components %}
 
 {% block title %}{{ event.name }} - FinVest{% endblock %}
 
@@ -7,10 +8,10 @@
     <!-- Header -->
     <div class="row mb-5">
         <div class="col-12">
-            <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                 <div>
-                    <h1 class="display-5 fw-bold mb-2">{{ event.name }}</h1>
-                    <p class="text-muted fs-5">{{ event.start_date }} to {{ event.end_date }}</p>
+                    <h1 class="display-5 fw-bold mb-2" style="font-family: var(--font-display); letter-spacing: -0.03em;">{{ event.name }}</h1>
+                    <p class="text-secondary mb-0" style="font-style: italic; font-size: 1.1rem;">{{ event.start_date }} to {{ event.end_date }}</p>
                 </div>
                 <a href="{{ url_for('events.index') }}" class="btn btn-outline-secondary fw-bold">
                     <i class="fas fa-arrow-left me-2"></i>Back
@@ -20,36 +21,16 @@
     </div>
 
     <!-- Budget Summary -->
-    <div class="row mb-5">
+    <div class="row mb-4">
+        {{ components.metric_card('Total Budget', '₹' ~ "%.0f"|format(event.budget or 0), 'fas fa-wallet', 'total_budget', 'primary') }}
+        {{ components.metric_card('Spent', '₹' ~ "%.0f"|format(total_spent or 0), 'fas fa-arrow-down', 'spent', 'danger') }}
+        {{ components.metric_card('Remaining', '₹' ~ "%.0f"|format([remaining_budget, 0]|max), 'fas fa-arrow-up', 'remaining', 'success' if remaining_budget >= 0 else 'danger') }}
+        
         <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 110, 253, 0.05) 100%);">
+            <div class="card border-0 shadow-sm h-100" {% if progress_percentage >= 100 %}style="border: 2px solid rgba(220, 53, 69, 0.3);"{% endif %}>
                 <div class="card-body text-center py-4">
-                    <h6 class="text-muted fw-bold small text-uppercase mb-3" style="letter-spacing: 0.5px;">Total Budget</h6>
-                    <h2 class="fw-bold text-primary mb-0">₹{{ "%.0f"|format(event.budget or 0) }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);">
-                <div class="card-body text-center py-4">
-                    <h6 class="text-muted fw-bold small text-uppercase mb-3" style="letter-spacing: 0.5px;">Spent</h6>
-                    <h2 class="fw-bold text-danger mb-0">₹{{ "%.0f"|format(total_spent or 0) }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);">
-                <div class="card-body text-center py-4">
-                    <h6 class="text-muted fw-bold small text-uppercase mb-3" style="letter-spacing: 0.5px;">Remaining</h6>
-                    <h2 class="fw-bold {{ 'text-success' if remaining_budget >= 0 else 'text-danger' }} mb-0">₹{{ "%.0f"|format([remaining_budget, 0]|max) }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm h-100" {% if progress_percentage >= 100 %}style="background: linear-gradient(135deg, rgba(220, 53, 69, 0.15) 0%, rgba(220, 53, 69, 0.05) 100%); border: 2px solid rgba(220, 53, 69, 0.3);"{% else %}style="background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);"{% endif %}>
-                <div class="card-body text-center py-4">
-                    <h6 class="text-muted fw-bold small text-uppercase mb-3" style="letter-spacing: 0.5px;">Progress</h6>
-                    <h2 class="fw-bold {{ 'text-danger' if progress_percentage >= 100 else 'text-warning' if progress_percentage >= 75 else 'text-muted' }} mb-2">{{ progress_percentage }}%</h2>
+                    <h6 class="text-secondary fw-bold small text-uppercase mb-3" style="letter-spacing: 0.5px;">Progress</h6>
+                    <h2 class="fw-bold {% if progress_percentage >= 100 %}text-danger{% elif progress_percentage >= 75 %}text-warning{% else %}text-secondary{% endif %} mb-2">{{ progress_percentage }}%</h2>
                     {% if progress_percentage >= 100 %}
                     <small class="text-danger fw-bold d-block">⚠ Over Budget</small>
                     {% endif %}
@@ -61,11 +42,11 @@
     <!-- Progress Bar -->
     <div class="row mb-5">
         <div class="col-12">
-            <div class="progress" style="height: 20px;">
+            <div class="progress" style="height: 16px; border-radius: var(--radius-sm);">
                 {% if progress_percentage >= 100 %}
                     <div class="progress-bar bg-danger" style="width: 100%"><small class="fw-bold text-white">Over Budget</small></div>
                 {% elif progress_percentage >= 75 %}
-                    <div class="progress-bar bg-warning" style="width: {{ progress_percentage }}%"><small class="fw-bold">{{ "%.0f"|format(progress_percentage) }}%</small></div>
+                    <div class="progress-bar bg-warning" style="width: {{ progress_percentage }}%"><small class="fw-bold text-dark">{{ "%.0f"|format(progress_percentage) }}%</small></div>
                 {% else %}
                     <div class="progress-bar bg-success" style="width: {{ progress_percentage }}%"><small class="fw-bold text-white">{{ "%.0f"|format(progress_percentage) }}%</small></div>
                 {% endif %}
@@ -77,27 +58,24 @@
     <div class="row mb-5">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-header border-0 bg-light py-3">
+                <div class="card-header border-0 bg-transparent py-4">
                     <h6 class="card-title mb-0 fw-bold d-flex align-items-center">
-                        <i class="fas fa-plus-circle me-2"></i>Add Transaction
+                        <i class="fas fa-plus-circle me-2 text-primary"></i>Add Transaction
                     </h6>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <form method="POST" action="{{ url_for('events.add_event_transaction', event_id=event.id) }}" class="row g-3">
-                        <!-- Hidden field to set type as expense -->
                         <input type="hidden" name="transaction_type" value="expense">
                         
                         <div class="col-md-4">
-                            <label for="transAmount" class="form-label small fw-bold">Amount (₹) *</label>
-                            <input type="number" step="0.01" min="0" class="form-control border-0 reports-input" id="transAmount" name="amount" required>
+                            {{ components.form_field('transAmount', 'Amount (₹)', type='number', required=true, name='amount', placeholder='0.00') }}
                         </div>
                         <div class="col-md-4">
-                            <label for="transDate" class="form-label small fw-bold">Date * ({{ event.start_date }} - {{ event.end_date }})</label>
-                            <input type="date" class="form-control border-0 reports-input" id="transDate" name="date" min="{{ event.start_date }}" max="{{ event.end_date }}" required>
+                            {{ components.form_field('transDate', 'Date (' ~ event.start_date ~ ' to ' ~ event.end_date ~ ')', type='date', required=true, name='date', min=event.start_date, max=event.end_date) }}
                         </div>
                         <div class="col-md-4">
-                            <label for="transCategory" class="form-label small fw-bold">Category *</label>
-                            <select class="form-select border-0 reports-input" id="transCategory" name="category" required>
+                            <label for="transCategory" class="form-label small fw-bold text-secondary">Category *</label>
+                            <select class="form-select border-0 bg-light p-3" id="transCategory" name="category" required style="border-radius: var(--radius-md); font-size: 0.95rem; height: 58px;">
                                 <option value="">Select category</option>
                                 <option value="Food">Food</option>
                                 <option value="Transportation">Transportation</option>
@@ -109,11 +87,10 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        <div class="col-12">
-                            <label for="transDescription" class="form-label small fw-bold">Description (optional)</label>
-                            <input type="text" class="form-control border-0 reports-input" id="transDescription" name="description" placeholder="Add a note...">
+                        <div class="col-12 mt-3">
+                            {{ components.form_field('transDescription', 'Description (optional)', name='description', placeholder='Add a note...') }}
                         </div>
-                        <div class="col-12">
+                        <div class="col-12 mt-4 d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary fw-bold">
                                 <i class="fas fa-save me-2"></i>Add Transaction
                             </button>
@@ -128,35 +105,41 @@
     <div class="row">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-header border-0 bg-light py-3">
+                <div class="card-header border-0 bg-transparent py-4">
                     <h6 class="card-title mb-0 fw-bold d-flex align-items-center">
-                        <i class="fas fa-list me-2"></i>Transactions ({{ transactions|length }})
+                        <i class="fas fa-list me-2 text-primary"></i>Transactions ({{ transactions|length }})
                     </h6>
                 </div>
                 <div class="card-body">
                     {% if transactions %}
                     <div class="table-responsive">
-                        <table class="table table-hover reports-table mb-0">
+                        <table class="table table-hover align-middle mb-0">
                             <thead>
-                                <tr class="border-bottom">
-                                    <th class="fw-bold text-uppercase small">Date</th>
-                                    <th class="fw-bold text-uppercase small">Description</th>
-                                    <th class="fw-bold text-uppercase small">Category</th>
-                                    <th class="fw-bold text-uppercase small">Type</th>
-                                    <th class="fw-bold text-uppercase small text-end">Amount</th>
-                                    <th class="fw-bold text-uppercase small" style="width: 60px;">Action</th>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end" style="width: 80px;">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for tx in transactions %}
-                                <tr class="border-bottom-light">
+                                <tr>
                                     <td class="fw-bold">{{ tx.date }}</td>
-                                    <td>{{ tx.description or '-' }}</td>
+                                    <td class="text-secondary">{{ tx.description or '-' }}</td>
                                     <td><span class="category-badge">{{ tx.category }}</span></td>
-                                    <td><span class="badge {{ 'bg-success' if tx.type == 'income' else 'bg-danger' }}">{{ tx.type }}</span></td>
-                                    <td class="fw-bold text-end {{ 'text-success' if tx.type == 'income' else 'text-danger' }}">₹{{ "%.2f"|format(tx.amount) }}</td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteTransaction({{ tx.id }})" title="Delete">
+                                        <span class="badge {% if tx.type == 'income' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ tx.type }}
+                                        </span>
+                                    </td>
+                                    <td class="fw-bold text-end {% if tx.type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                                        ₹{{ "%.2f"|format(tx.amount) }}
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-danger p-2" onclick="deleteTransaction({{ tx.id }})" title="Delete">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
@@ -168,7 +151,7 @@
                     {% else %}
                     <div class="text-center py-5">
                         <i class="fas fa-inbox fa-3x text-muted opacity-50 mb-3"></i>
-                        <p class="text-muted small">No transactions yet</p>
+                        <p class="text-secondary mb-0">No transactions recorded for this event yet.</p>
                     </div>
                     {% endif %}
                 </div>
@@ -176,7 +159,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
     function deleteTransaction(txId) {
         if (confirm('Delete this transaction?')) {
@@ -184,18 +169,29 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Transaction deleted!');
-                        location.reload();
+                        if (window.showAlert) {
+                            window.showAlert('Transaction deleted successfully!', 'success');
+                        } else {
+                            alert('Transaction deleted successfully!');
+                        }
+                        setTimeout(() => { location.reload(); }, 1500);
                     } else {
-                        alert('Error: ' + data.message);
+                        if (window.showAlert) {
+                            window.showAlert('Error: ' + data.message, 'error');
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred.');
+                    if (window.showAlert) {
+                        window.showAlert('An error occurred.', 'error');
+                    } else {
+                        alert('An error occurred.');
+                    }
                 });
         }
     }
 </script>
-
 {% endblock %}
