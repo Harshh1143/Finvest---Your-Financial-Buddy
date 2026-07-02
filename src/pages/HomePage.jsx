@@ -504,7 +504,7 @@ export function HomePage() {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm font-semibold">
                           <span className="text-slate-300">Loan Principal</span>
-                          <span className="text-cyan-300">${loanAmount.toLocaleString()}</span>
+                          <span className="text-cyan-300">${loanAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                         <input 
                           type="range" 
@@ -567,11 +567,11 @@ export function HomePage() {
                       <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
                         <div className="p-3 bg-white/5 rounded-xl border border-white/5">
                           <span className="text-[10px] uppercase text-slate-400 font-bold">Projected Monthly EMI</span>
-                          <p className="text-xl font-bold text-white mt-1">${Math.round(emi).toLocaleString()}</p>
+                          <p className="text-xl font-bold text-white mt-1">${emi.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                         </div>
                         <div className="p-3 bg-white/5 rounded-xl border border-white/5">
                           <span className="text-[10px] uppercase text-slate-400 font-bold">Total Interest Payable</span>
-                          <p className="text-xl font-bold text-purple-300 mt-1">${Math.round(totalInterest).toLocaleString()}</p>
+                          <p className="text-xl font-bold text-purple-300 mt-1">${totalInterest.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                         </div>
                       </div>
                     </div>
@@ -605,18 +605,18 @@ export function HomePage() {
                             <div className="w-3 h-3 rounded-full bg-cyan-400" />
                             <span>Principal Loan</span>
                           </div>
-                          <span className="font-bold text-white">${loanAmount.toLocaleString()}</span>
+                          <span className="font-bold text-white">${loanAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                         <div className="flex items-center justify-between text-slate-300">
                           <div className="flex items-center gap-2">
                             <div className="w-3 h-3 rounded-full bg-purple-400" />
                             <span>Total Interest</span>
                           </div>
-                          <span className="font-bold text-white">${Math.round(totalInterest).toLocaleString()}</span>
+                          <span className="font-bold text-white">${totalInterest.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                         <div className="flex items-center justify-between border-t border-white/5 pt-2 text-slate-200 font-bold">
                           <span>Total Amount</span>
-                          <span>${Math.round(totalRepayment).toLocaleString()}</span>
+                          <span>${totalRepayment.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                       </div>
                     </div>
@@ -644,7 +644,7 @@ export function HomePage() {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm font-semibold">
                           <span className="text-slate-300">Monthly Contribution</span>
-                          <span className="text-cyan-300">${monthlySavings.toLocaleString()}/mo</span>
+                          <span className="text-cyan-300">${monthlySavings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mo</span>
                         </div>
                         <input 
                           type="range" 
@@ -707,11 +707,11 @@ export function HomePage() {
                       <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
                         <div className="p-3 bg-white/5 rounded-xl border border-white/5">
                           <span className="text-[10px] uppercase text-slate-400 font-bold">Total Contributions</span>
-                          <p className="text-xl font-bold text-white mt-1">${Math.round(totalContributions).toLocaleString()}</p>
+                          <p className="text-xl font-bold text-white mt-1">${totalContributions.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                         </div>
                         <div className="p-3 bg-white/5 rounded-xl border border-white/5">
                           <span className="text-[10px] uppercase text-slate-400 font-bold">Compound Growth Balance</span>
-                          <p className="text-xl font-bold text-cyan-300 mt-1">${Math.round(balance).toLocaleString()}</p>
+                          <p className="text-xl font-bold text-cyan-300 mt-1">${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                         </div>
                       </div>
                     </div>
@@ -746,7 +746,7 @@ export function HomePage() {
                             <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" />
                             <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fill: "#64748b", fontSize: 10 }} />
                             <YAxis tickLine={false} axisLine={false} tickFormatter={(val) => `$${val/1000}k`} tick={{ fill: "#64748b", fontSize: 10 }} />
-                            <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
+                            <Tooltip formatter={(value) => `$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} />
                             <Area type="monotone" dataKey="Contributions" stroke="#475569" fillOpacity={1} fill="url(#colorContrib)" strokeWidth={1.5} />
                             <Area type="monotone" dataKey="Interest" stroke="#22d3ee" fillOpacity={1} fill="url(#colorInterest)" strokeWidth={2.5} />
                           </AreaChart>

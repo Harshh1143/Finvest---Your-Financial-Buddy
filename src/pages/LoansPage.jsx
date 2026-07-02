@@ -21,7 +21,7 @@ const CustomTooltip = ({ active, payload, label }) => {
       <div className="rounded-2xl border border-white/10 bg-slate-950/85 px-4 py-3 backdrop-blur-md shadow-2xl">
         <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-400">{label}</p>
         <p className="mt-1.5 text-base font-bold text-white">
-          Projected: ${Number(payload[0].value).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          Projected: ${Number(payload[0].value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </p>
       </div>
     );
@@ -328,7 +328,7 @@ export function LoansPage() {
                                                             Original Principal
                                                         </p>
                                                         <p className="mt-1 font-bold text-white text-sm">
-                                                            ${loan.principal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                            ${loan.principal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                         </p>
                                                     </div>
                                                     <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
@@ -336,7 +336,7 @@ export function LoansPage() {
                                                             Interest Paid
                                                         </p>
                                                         <p className="mt-1 font-bold text-white text-sm">
-                                                            ${loan.interest_paid.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                            ${loan.interest_paid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -483,10 +483,10 @@ export function LoansPage() {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     {[
-                                        ["Total principal", `$${Math.round(totalPrincipal).toLocaleString()}`],
-                                        ["Total remaining", `$${Math.round(totalRemaining).toLocaleString()}`],
-                                        ["Total paid off", `$${Math.round(totalPaid).toLocaleString()}`],
-                                        ["Total interest paid", `$${Math.round(totalInterestPaid).toLocaleString()}`],
+                                        ["Total principal", `$${totalPrincipal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
+                                        ["Total remaining", `$${totalRemaining.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
+                                        ["Total paid off", `$${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
+                                        ["Total interest paid", `$${totalInterestPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
                                         ["Next payment due", formatNextDue(nextDueDate)],
                                     ].map(([label, value]) => (
                                         <div key={label} className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 px-4.5 py-3.5 hover:bg-white/10 transition-all duration-300">
