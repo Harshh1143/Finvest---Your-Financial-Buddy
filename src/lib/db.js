@@ -909,9 +909,9 @@ export const db = {
                     const principalForMonth = loan.monthly_emi - interestForMonth;
                     const totalPaidThisMonth = loan.monthly_emi + extraPayment;
                     const principalPaidThisMonth = principalForMonth + extraPayment;
-                    const remaining = Math.max(0, loan.remaining - principalPaidThisMonth);
-                    const total_paid = loan.total_paid + totalPaidThisMonth;
-                    const interest_paid = loan.interest_paid + interestForMonth;
+                    const remaining = parseFloat(Math.max(0, loan.remaining - principalPaidThisMonth).toFixed(2));
+                    const total_paid = parseFloat((loan.total_paid + totalPaidThisMonth).toFixed(2));
+                    const interest_paid = parseFloat((loan.interest_paid + interestForMonth).toFixed(2));
                     const nextPaymentDate = loan.next_payment_date
                         ? new Date(new Date(loan.next_payment_date).setMonth(new Date(loan.next_payment_date).getMonth() + 1))
                             .toISOString()
@@ -941,7 +941,7 @@ export const db = {
                 const principalForMonth = loan.monthly_emi - interestForMonth;
                 const totalPaidThisMonth = loan.monthly_emi + extraPayment;
                 const principalPaidThisMonth = principalForMonth + extraPayment;
-                loan.remaining = Math.max(0, loan.remaining - principalPaidThisMonth);
+                loan.remaining = parseFloat(Math.max(0, loan.remaining - principalPaidThisMonth).toFixed(2));
                 loan.total_paid = parseFloat((loan.total_paid + totalPaidThisMonth).toFixed(2));
                 loan.interest_paid = parseFloat((loan.interest_paid + interestForMonth).toFixed(2));
                 if (loan.next_payment_date) {
