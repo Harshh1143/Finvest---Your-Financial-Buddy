@@ -46,13 +46,171 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Trusted Tech Logos
 const brandLogos = [
-  { name: "Stripe", icon: Coins },
-  { name: "Ramp", icon: Zap },
-  { name: "Mercury", icon: ShieldCheck },
-  { name: "Vercel", icon: Activity },
-  { name: "Linear", icon: Layers },
-  { name: "Apple Pay", icon: Wallet },
-  { name: "Arc Browser", icon: Sparkles },
+  { name: "Asteroid Kit", renderIcon: () => (
+      <svg className="w-5 h-5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <line x1="8" y1="20" x2="16" y2="4" />
+        <line x1="12" y1="20" x2="20" y2="4" />
+      </svg>
+    ) 
+  },
+  { name: "Aceternity UI", renderIcon: () => (
+      <div className="w-4 h-4 bg-white rounded-[3px] flex items-center justify-center text-black font-extrabold text-[9px] leading-none">
+        A
+      </div>
+    ) 
+  },
+  { name: "Gamity", renderIcon: () => (
+      <svg className="w-5 h-5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v9M12 12l-6.364-6.364M12 12l6.364 6.364M12 12H3m9 0h9m-9 0l-6.364 6.364M12 12l6.364-6.364" />
+      </svg>
+    ) 
+  },
+  { name: "Host IT", renderIcon: () => (
+      <svg className="w-5 h-5 text-cyan-400 animate-spin-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="5" />
+        <circle cx="12" cy="12" r="1.5" />
+      </svg>
+    ) 
+  }
+];
+
+// Infinite Marquee Cards content
+const marqueeCards = [
+  {
+    isWhite: false,
+    content: (
+      <div className="flex flex-col justify-between h-full text-left">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">Live Portfolios</span>
+            <div className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </div>
+          <h4 className="text-lg font-bold tracking-tight text-white mb-1">Consolidated Wealth Ledger</h4>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Plaid integrated auto-sync logs all your traditional and alternative assets under a clean, secure view.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <span className="text-[9px] font-semibold bg-white/5 border border-white/5 rounded-full px-2 py-0.5 text-slate-400">Stocks</span>
+          <span className="text-[9px] font-semibold bg-white/5 border border-white/5 rounded-full px-2 py-0.5 text-slate-400">Crypto</span>
+          <span className="text-[9px] font-semibold bg-white/5 border border-white/5 rounded-full px-2 py-0.5 text-slate-400">Real Estate</span>
+        </div>
+      </div>
+    )
+  },
+  {
+    isWhite: true,
+    content: (
+      <div className="flex flex-col justify-between h-full text-left">
+        <div>
+          <div className="flex justify-between items-start mb-4">
+            <h4 className="text-xl font-bold tracking-tight text-black leading-tight">
+              Launch your <br />
+              financial workspace.
+            </h4>
+            <div className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center">
+              <ChevronRight className="h-4 w-4 text-black" />
+            </div>
+          </div>
+          <p className="text-xs text-slate-600">
+            Create a premium account to start projecting budgets with standard formulas.
+          </p>
+        </div>
+        <span className="text-[10px] font-bold tracking-wider text-black uppercase">GET STARTED FREE</span>
+      </div>
+    )
+  },
+  {
+    isWhite: false,
+    content: (
+      <div className="flex flex-col justify-between h-full text-left">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] font-bold tracking-wider text-[#6366f1] uppercase">AI SWEEPING</span>
+            <Sparkles className="h-4 w-4 text-[#6366f1]" />
+          </div>
+          <h4 className="text-lg font-bold tracking-tight text-white mb-1">Interactive Advisor Swarms</h4>
+          <p className="text-xs text-slate-400 leading-relaxed font-mono">
+            $ debt: avalanche_mode active. Recommending relocation of dividend assets. Net yield +1.4%.
+          </p>
+        </div>
+        <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono">
+          <span>SWEEP OK</span>
+          <span>EST. SAVINGS: $14.8K</span>
+        </div>
+      </div>
+    )
+  },
+  {
+    isWhite: true,
+    content: (
+      <div className="flex flex-col justify-between h-full text-left">
+        <div>
+          <div className="flex justify-between items-start mb-4">
+            <h4 className="text-xl font-bold tracking-tight text-black leading-tight">
+              Interactive <br />
+              Simulator Sandbox.
+            </h4>
+            <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
+              <ChevronRight className="h-4 w-4 text-white" />
+            </div>
+          </div>
+          <p className="text-xs text-slate-600">
+            Try compound growth projections and EMI calculators with instant charting logic.
+          </p>
+        </div>
+        <span className="text-[10px] font-bold tracking-wider text-black uppercase">TRY SANDBOX NOW</span>
+      </div>
+    )
+  },
+  {
+    isWhite: false,
+    content: (
+      <div className="flex flex-col justify-between h-full text-left">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] font-bold tracking-wider text-purple-400 uppercase">LOAN OPTIMIZATION</span>
+            <TrendingUp className="h-4 w-4 text-purple-400" />
+          </div>
+          <h4 className="text-lg font-bold tracking-tight text-white mb-1">Interest Minimizer Curve</h4>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Visually balance loan amounts, tenure lengths, and interest rates to calculate optimal payoffs.
+          </p>
+        </div>
+        <div>
+          <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-full bg-purple-400 rounded-full" style={{ width: "65%" }} />
+          </div>
+          <div className="flex justify-between text-[9px] font-semibold text-slate-500 mt-1">
+            <span>65% INTEREST DECREASE</span>
+            <span>$12.5K SAVED</span>
+          </div>
+        </div>
+      </div>
+    )
+  },
+  {
+    isWhite: false,
+    content: (
+      <div className="flex flex-col justify-between h-full text-left">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] font-bold tracking-wider text-emerald-400 uppercase">Vault Security</span>
+            <ShieldCheck className="h-4 w-4 text-emerald-400" />
+          </div>
+          <h4 className="text-lg font-bold tracking-tight text-white mb-1">SOC 2 Type II Certified</h4>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Bank-grade AES-256 data protection and encrypted access tokens keep your capital securely tracked.
+          </p>
+        </div>
+        <div className="flex gap-4 text-[10px] text-slate-500 font-semibold">
+          <span className="flex items-center gap-1"><Check className="h-3.5 w-3.5 text-emerald-400" /> ENCRYPTED</span>
+          <span className="flex items-center gap-1"><Check className="h-3.5 w-3.5 text-emerald-400" /> READ-ONLY</span>
+        </div>
+      </div>
+    )
+  }
 ];
 
 export function HomePage() {
@@ -81,13 +239,6 @@ export function HomePage() {
         ".hero-reveal",
         { opacity: 0, y: 40 },
         { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: "power3.out" }
-      );
-
-      // Parallax effect on floating elements in the hero
-      gsap.fromTo(
-        ".hero-floating",
-        { y: 30 },
-        { y: -30, scrollTrigger: { trigger: heroRef.current, start: "top top", end: "bottom top", scrub: 1 } }
       );
 
       // Feature card fade ins
@@ -146,7 +297,7 @@ export function HomePage() {
   const totalInterest = Math.max(0, totalRepayment - P);
 
   const emiPieData = [
-    { name: "Principal", value: Math.round(P), color: "#22d3ee" },
+    { name: "Principal", value: Math.round(P), color: "#6366f1" },
     { name: "Total Interest", value: Math.round(totalInterest), color: "#a78bfa" },
   ];
 
@@ -244,14 +395,14 @@ export function HomePage() {
   ];
 
   return (
-    <div ref={containerRef} className="mesh-gradient min-h-screen relative overflow-hidden font-sans">
+    <div ref={containerRef} className="bg-black min-h-screen relative overflow-hidden font-sans">
       
       {/* Interactive Ambient Radial Glow Blobs */}
       <div 
         className="pointer-events-none fixed inset-0 z-0 transition-transform duration-300 ease-out opacity-25"
         style={{
-          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(34, 211, 238, 0.12), transparent 80%),
-                       radial-gradient(500px circle at ${mousePos.x + 200}px ${mousePos.y - 100}px, rgba(167, 139, 250, 0.1), transparent 80%)`
+          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(99, 102, 241, 0.15), transparent 80%),
+                       radial-gradient(500px circle at ${mousePos.x + 200}px ${mousePos.y - 100}px, rgba(34, 211, 238, 0.12), transparent 80%)`
         }}
       />
 
@@ -259,164 +410,106 @@ export function HomePage() {
         {/* ==================================================
             HERO SECTION
             ================================================== */}
-        <section ref={heroRef} className="relative mx-auto max-w-7xl px-6 pt-16 pb-24 lg:grid lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:px-8 lg:pt-24 lg:pb-36 z-10">
-          <div className="flex flex-col justify-center space-y-8">
-            
-            {/* Glowing Pill Badge */}
-            <div className="hero-reveal inline-flex w-fit items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-4 py-1.5 text-xs font-medium tracking-wide text-cyan-200 shadow-[0_0_20px_rgba(34,211,238,0.1)]">
-              <Sparkles className="h-3.5 w-3.5 text-cyan-300 animate-pulse" />
-              <span>Finvest 2.0 — The Premium Wealth Operating System</span>
+        <section ref={heroRef} className="relative mx-auto max-w-7xl px-6 pt-24 pb-20 flex flex-col items-center justify-center text-center z-10">
+          
+          {/* Centered Avatar Stack */}
+          <div className="hero-reveal flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
+            <div className="flex -space-x-3 overflow-hidden">
+              {/* Avatar 1 */}
+              <div className="inline-block h-8 w-8 rounded-full ring-2 ring-black bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-[10px] font-bold text-white">
+                JD
+              </div>
+              {/* Avatar 2 */}
+              <div className="inline-block h-8 w-8 rounded-full ring-2 ring-black bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-[10px] font-bold text-white">
+                AM
+              </div>
+              {/* Avatar 3 */}
+              <div className="inline-block h-8 w-8 rounded-full ring-2 ring-black bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-[10px] font-bold text-white">
+                KR
+              </div>
+              {/* Avatar 4 */}
+              <div className="inline-block h-8 w-8 rounded-full ring-2 ring-black bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-[10px] font-bold text-white">
+                SL
+              </div>
+              {/* Avatar 5 (Rightmost with red border) */}
+              <div className="inline-block h-8 w-8 rounded-full ring-2 ring-rose-500 bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-[10px] font-bold text-white">
+                TH
+              </div>
             </div>
-
-            {/* Main Headline */}
-            <h1 className="hero-reveal max-w-3xl text-5xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Wealth management, <br />
-              <span className="text-gradient-cyan-purple">designed for clarity.</span>
-            </h1>
-
-            {/* Description */}
-            <p className="hero-reveal max-w-xl text-lg leading-relaxed text-slate-300">
-              Replace standard spreadsheets and generic trackers with a handcrafted workspace. Plan budgets, project investments, simulate loan repayments, and make clean financial decisions.
-            </p>
-
-            {/* CTA Actions */}
-            <div className="hero-reveal flex flex-wrap gap-4 pt-2">
-              <Link to="/dashboard">
-                <Button size="lg" className="rounded-full bg-cyan-400 text-slate-950 font-semibold hover:bg-cyan-300 transition duration-300 px-8 shadow-[0_8px_30px_rgb(34,211,238,0.25)] flex items-center group">
-                  Launch Workspace
-                  <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              
-              <a href="#sandbox">
-                <Button variant="outline" size="lg" className="rounded-full border-white/10 bg-white/5 hover:bg-white/10 text-white font-medium transition duration-300 px-8">
-                  Interactive Simulator
-                </Button>
-              </a>
-            </div>
-
-            {/* Checkmarks */}
-            <div className="hero-reveal flex flex-wrap gap-6 pt-4 text-xs font-semibold tracking-wider uppercase text-slate-400">
-              <span className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-cyan-400" /> Unified portfolio tracking
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-cyan-400" /> Smart forecasts & simulations
-              </span>
-            </div>
+            <span className="text-xs font-semibold text-slate-400 tracking-wide">
+              Trusted by <span className="text-white">10,000+</span> modern builders
+            </span>
           </div>
 
-          {/* Floating Premium Visual Centerpiece */}
-          <div className="relative mt-16 lg:mt-0 flex items-center justify-center">
-            {/* Visual background lights */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-cyan-500/20 rounded-full blur-[90px] pointer-events-none" />
-            <div className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[250px] h-[250px] bg-purple-500/20 rounded-full blur-[80px] pointer-events-none" />
+          {/* Centered Headline */}
+          <h1 className="hero-reveal max-w-4xl text-5xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-7.5xl">
+            Your best in class <br />
+            <span className="text-gradient-cyan-purple">wealth management workspace ⚡</span>
+          </h1>
 
-            {/* Main Mockup Glass Panel */}
-            <div className="hero-floating w-full max-w-[480px] glass-card rounded-3xl p-6 relative border-white/10 shadow-2xl transition duration-500 hover:border-cyan-500/30">
-              
-              {/* Premium Header Decoration */}
-              <div className="flex items-center justify-between pb-6 border-b border-white/5 mb-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/60" />
-                </div>
-                <div className="text-xs text-slate-500 font-semibold tracking-[0.2em] uppercase">FINVEST PLATFORM</div>
-              </div>
+          {/* Centered Subtitle */}
+          <p className="hero-reveal max-w-2xl text-lg leading-relaxed text-slate-400 mt-6">
+            We provide the best in class financial management services for teams that ship with the speed of light.
+          </p>
 
-              {/* Graphic Asset / Generated Premium Photo */}
-              <div className="relative w-full h-[180px] rounded-2xl overflow-hidden mb-6 group border border-white/10">
-                <img 
-                  src="/fintech_glass_hero.png" 
-                  alt="Fintech glass asset" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent" />
-                <div className="absolute bottom-4 left-4">
-                  <div className="text-xs font-semibold text-cyan-300 tracking-wider uppercase mb-1">LIVE PERFORMANCE</div>
-                  <div className="text-xl font-bold text-white tracking-tight">+$12,840.42 this month</div>
-                </div>
-              </div>
+          {/* Centered CTA Action */}
+          <div className="hero-reveal flex justify-center mt-8">
+            <Link to="/dashboard">
+              <button className="bg-white hover:bg-slate-100 text-black font-bold text-sm py-3.5 px-8 rounded-[8px] transition duration-300 shadow-[0_4px_25px_rgba(255,255,255,0.15)] cursor-pointer">
+                Book a call
+              </button>
+            </Link>
+          </div>
 
-              {/* Inflows & Stats */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between bg-white/5 hover:bg-white/10 transition rounded-xl p-3 border border-white/5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-cyan-400/20 flex items-center justify-center">
-                      <TrendingUp className="h-4 w-4 text-cyan-300" />
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-400 font-medium">Stripe Merchant Inflow</div>
-                      <div className="text-sm font-semibold text-white">Settled directly</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-bold text-cyan-300">+$9,480.00</div>
-                    <div className="text-[10px] text-emerald-400 font-bold">+8.2% vs prev</div>
-                  </div>
+          {/* Centered Grayscale Brand Logos Section */}
+          <div className="hero-reveal mt-24 text-center w-full max-w-5xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 mb-8">
+              Trusted by famous brands
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-12 md:gap-20 opacity-60">
+              {brandLogos.map((logo, idx) => (
+                <div key={idx} className="flex items-center gap-2.5 group cursor-default hover:opacity-100 transition duration-300">
+                  {logo.renderIcon()}
+                  <span className="text-base font-bold text-slate-400 group-hover:text-white transition duration-300 tracking-tight">
+                    {logo.name}
+                  </span>
                 </div>
-
-                <div className="flex items-center justify-between bg-white/5 hover:bg-white/10 transition rounded-xl p-3 border border-white/5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-purple-400/20 flex items-center justify-center">
-                      <Lock className="h-4 w-4 text-purple-300" />
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-400 font-medium">Loan Collateral Vault</div>
-                      <div className="text-sm font-semibold text-white">Smart contract secured</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-bold text-slate-200">100% active</div>
-                    <div className="text-[10px] text-slate-400">Escrowed lock</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Small absolute floating secondary card */}
-            <div className="hero-floating absolute -bottom-6 -left-6 glass-card rounded-2xl p-4 border-white/10 shadow-xl hidden sm:block max-w-[200px]">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-6 h-6 rounded-md bg-emerald-500/20 flex items-center justify-center">
-                  <Check className="h-3 w-3 text-emerald-400" />
-                </div>
-                <div className="text-xs text-slate-300 font-semibold">Net Worth Proj.</div>
-              </div>
-              <div className="text-lg font-bold text-white">$184.2K</div>
-              <div className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-                <span>+12.4%</span>
-                <span className="text-slate-500 font-normal">this year</span>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* ==================================================
-            TRUSTED BY SECTION (LOGO TICKER)
+            FEATURES MARQUEE SECTION
             ================================================== */}
-        <section className="relative py-12 border-y border-white/5 bg-slate-950/20 backdrop-blur z-10">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 mb-8">
-              ENGINEERED TO INTEGRATE SECURELY WITH MODERN PLATFORMS
-            </p>
-            
-            {/* Logo Marquee Wrapper */}
-            <div className="relative flex overflow-x-hidden justify-center items-center">
-              <div className="animate-marquee flex gap-12 md:gap-20 items-center justify-center flex-wrap">
-                {brandLogos.map((logo, idx) => {
-                  const Icon = logo.icon;
-                  return (
-                    <div key={idx} className="flex items-center gap-2.5 opacity-60 hover:opacity-100 transition duration-300 group cursor-default">
-                      <Icon className="h-5 w-5 text-slate-400 group-hover:text-cyan-300 transition duration-300" />
-                      <span className="text-base font-bold text-slate-300 group-hover:text-white transition duration-300 tracking-tight">
-                        {logo.name}
-                      </span>
-                    </div>
-                  );
-                })}
+        <section id="features" ref={featuresRef} className="relative w-full overflow-hidden py-16 border-y border-white/5 bg-[#030303]/40 z-10">
+          <div className="flex gap-6 animate-marquee-scroll">
+            {/* First loop of cards */}
+            {marqueeCards.map((card, index) => (
+              <div 
+                key={`marquee-1-${index}`} 
+                className={`feature-card w-[320px] h-[220px] shrink-0 rounded-2xl p-6 flex flex-col justify-between border transition duration-300 ${
+                  card.isWhite 
+                    ? "bg-white text-black border-slate-200" 
+                    : "bg-slate-900/40 text-white border-white/10 backdrop-blur-sm hover:border-cyan-500/30"
+                }`}
+              >
+                {card.content}
               </div>
-            </div>
+            ))}
+            {/* Second loop of cards for seamless scroll */}
+            {marqueeCards.map((card, index) => (
+              <div 
+                key={`marquee-2-${index}`} 
+                className={`feature-card w-[320px] h-[220px] shrink-0 rounded-2xl p-6 flex flex-col justify-between border transition duration-300 ${
+                  card.isWhite 
+                    ? "bg-white text-black border-slate-200" 
+                    : "bg-slate-900/40 text-white border-white/10 backdrop-blur-sm hover:border-cyan-500/30"
+                }`}
+              >
+                {card.content}
+              </div>
+            ))}
           </div>
         </section>
 
