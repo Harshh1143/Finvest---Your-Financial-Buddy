@@ -1,11 +1,3 @@
-import { createClient } from "@supabase/supabase-js";
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-export const supabase = supabaseUrl && supabaseAnonKey
-    ? createClient(supabaseUrl, supabaseAnonKey, {
-        auth: {
-            persistSession: true,
-            autoRefreshToken: true,
-        },
-    })
-    : null;
+// Supabase client removed - now using Express/MongoDB backend
+// Kept for backwards compatibility but not used
+export const supabase = null;
