@@ -77,25 +77,25 @@ export function AuthForm() {
     };
 
     return (
-        <div className="flex min-h-screen w-full bg-[#09090b] text-white font-sans selection:bg-amber-500/30 selection:text-white">
+        <div className="flex min-h-screen w-full bg-brand-midnight text-brand-cream font-sans selection:bg-brand-cobalt/30 selection:text-brand-cream">
             {/* Left Pane: Form Container */}
             <div className="flex w-full md:w-1/2 lg:w-[55%] flex-col justify-between p-6 sm:p-10 md:p-16 min-h-screen overflow-y-auto">
                 {/* Logo & Navigation Bar */}
                 <div className="flex items-center gap-3">
-                    <svg className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="h-5 w-5 text-brand-cream" viewBox="0 0 24 24" fill="currentColor">
                         <rect x="4" y="4" width="8.5" height="8.5" rx="2" />
                         <rect x="11.5" y="11.5" width="8.5" height="8.5" rx="2" />
                     </svg>
-                    <span className="font-semibold text-lg tracking-[0.25em] text-white">FINVEST</span>
+                    <span className="font-bold text-base tracking-[0.25em] text-brand-cream font-mono">FINVEST</span>
                 </div>
 
                 {/* Main Auth Form Box */}
                 <div className="mx-auto w-full max-w-[420px] py-12 md:py-16 space-y-8">
                     <div className="space-y-3">
-                        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
-                            {isLogin ? "Welcome back!" : "Create your account"}
+                        <h1 className="text-3xl font-extrabold tracking-tight text-brand-cream">
+                            {isLogin ? "Welcome back" : "Create your account"}
                         </h1>
-                        <p className="text-sm text-zinc-400 leading-relaxed font-light">
+                        <p className="text-xs text-brand-silver leading-relaxed font-medium">
                             {isLogin 
                                 ? "We empower individuals to plan, track, and grow their wealth with modern intelligent financial tools." 
                                 : "Join Finvest today to start tracking, managing, and optimizing your wealth in one unified platform."}
@@ -106,7 +106,7 @@ export function AuthForm() {
                         <motion.div 
                             initial={{ opacity: 0, y: -8 }} 
                             animate={{ opacity: 1, y: 0 }} 
-                            className="rounded-xl border border-red-500/20 bg-red-500/5 p-4 text-center text-sm text-red-400"
+                            className="rounded-lg border border-red-500/20 bg-red-500/5 p-4 text-center text-xs text-red-400 font-mono"
                         >
                             {error}
                         </motion.div>
@@ -124,12 +124,12 @@ export function AuthForm() {
                                 className="space-y-5"
                             >
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Email</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-brand-silver">Email</label>
                                     <input 
                                         {...registerLogin("email")} 
                                         type="email" 
                                         placeholder="youremail@yourdomain.com" 
-                                        className="w-full rounded-lg border border-zinc-800 bg-[#161618] py-3 px-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700"
+                                        className="w-full rounded-lg border border-brand-cream/10 bg-brand-cream/5 py-3.5 px-4 text-xs text-brand-cream placeholder-brand-silver/30 outline-none transition focus:border-brand-cobalt"
                                         disabled={isLoading}
                                     />
                                     {loginErrors.email && (
@@ -138,12 +138,12 @@ export function AuthForm() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Password</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-brand-silver">Password</label>
                                     <input 
                                         {...registerLogin("password")} 
                                         type="password" 
                                         placeholder="••••••••" 
-                                        className="w-full rounded-lg border border-zinc-800 bg-[#161618] py-3 px-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700"
+                                        className="w-full rounded-lg border border-brand-cream/10 bg-brand-cream/5 py-3.5 px-4 text-xs text-brand-cream placeholder-brand-silver/30 outline-none transition focus:border-brand-cobalt"
                                         disabled={isLoading}
                                     />
                                     {loginErrors.password && (
@@ -153,12 +153,12 @@ export function AuthForm() {
 
                                 <button 
                                     type="submit" 
-                                    className="w-full py-3 bg-[#27272a] hover:bg-[#3f3f46] text-white font-medium rounded-lg transition duration-200 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full py-3.5 bg-brand-cream hover:bg-brand-cream/90 text-brand-midnight font-bold rounded-lg transition duration-200 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     disabled={isLoading}
                                 >
                                     {isLoading ? (
                                         <>
-                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            <Loader2 className="h-4 w-4 animate-spin text-brand-midnight" />
                                             Signing in...
                                         </>
                                     ) : (
@@ -177,12 +177,12 @@ export function AuthForm() {
                                 className="space-y-5"
                             >
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Full name</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-brand-silver">Full name</label>
                                     <input 
                                         {...registerSignup("name")} 
                                         type="text" 
                                         placeholder="Alex Morgan" 
-                                        className="w-full rounded-lg border border-zinc-800 bg-[#161618] py-3 px-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700"
+                                        className="w-full rounded-lg border border-brand-cream/10 bg-brand-cream/5 py-3.5 px-4 text-xs text-brand-cream placeholder-brand-silver/30 outline-none transition focus:border-brand-cobalt"
                                         disabled={isLoading}
                                     />
                                     {signupErrors.name && (
@@ -191,12 +191,12 @@ export function AuthForm() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Email</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-brand-silver">Email</label>
                                     <input 
                                         {...registerSignup("email")} 
                                         type="email" 
                                         placeholder="youremail@yourdomain.com" 
-                                        className="w-full rounded-lg border border-zinc-800 bg-[#161618] py-3 px-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700"
+                                        className="w-full rounded-lg border border-brand-cream/10 bg-brand-cream/5 py-3.5 px-4 text-xs text-brand-cream placeholder-brand-silver/30 outline-none transition focus:border-brand-cobalt"
                                         disabled={isLoading}
                                     />
                                     {signupErrors.email && (
@@ -205,12 +205,12 @@ export function AuthForm() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Password</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-brand-silver">Password</label>
                                     <input 
                                         {...registerSignup("password")} 
                                         type="password" 
                                         placeholder="Create a password" 
-                                        className="w-full rounded-lg border border-zinc-800 bg-[#161618] py-3 px-4 text-sm text-white placeholder-zinc-500 outline-none transition focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700"
+                                        className="w-full rounded-lg border border-brand-cream/10 bg-brand-cream/5 py-3.5 px-4 text-xs text-brand-cream placeholder-brand-silver/30 outline-none transition focus:border-brand-cobalt"
                                         disabled={isLoading}
                                     />
                                     {signupErrors.password && (
@@ -220,12 +220,12 @@ export function AuthForm() {
 
                                 <button 
                                     type="submit" 
-                                    className="w-full py-3 bg-[#27272a] hover:bg-[#3f3f46] text-white font-medium rounded-lg transition duration-200 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full py-3.5 bg-brand-cream hover:bg-brand-cream/90 text-brand-midnight font-bold rounded-lg transition duration-200 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     disabled={isLoading}
                                 >
                                     {isLoading ? (
                                         <>
-                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            <Loader2 className="h-4 w-4 animate-spin text-brand-midnight" />
                                             Creating account...
                                         </>
                                     ) : (
@@ -239,10 +239,10 @@ export function AuthForm() {
                     {/* Social Divider */}
                     <div className="relative my-6">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-zinc-900" />
+                            <div className="w-full border-t border-brand-cream/5" />
                         </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-[#09090b] px-2 text-zinc-500 font-medium tracking-widest">or</span>
+                        <div className="relative flex justify-center text-[10px] uppercase">
+                            <span className="bg-brand-midnight px-2 text-brand-silver font-bold tracking-widest font-mono">or</span>
                         </div>
                     </div>
 
@@ -251,9 +251,9 @@ export function AuthForm() {
                         <button
                             type="button"
                             onClick={() => handleSocialClick("Google")}
-                            className="flex items-center justify-center py-3 bg-[#161618] hover:bg-[#27272a] border border-zinc-800 hover:border-zinc-700 rounded-lg transition duration-200 cursor-pointer"
+                            className="flex items-center justify-center py-3 bg-brand-cream/5 hover:bg-brand-cream/10 border border-brand-cream/10 rounded-lg transition duration-200 cursor-pointer"
                         >
-                            <svg className="h-5 w-5" viewBox="0 0 24 24">
+                            <svg className="h-4 w-4" viewBox="0 0 24 24">
                                 <path
                                     fill="#4285F4"
                                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -275,25 +275,25 @@ export function AuthForm() {
                         <button
                             type="button"
                             onClick={() => handleSocialClick("Facebook")}
-                            className="flex items-center justify-center py-3 bg-[#161618] hover:bg-[#27272a] border border-zinc-800 hover:border-zinc-700 rounded-lg transition duration-200 cursor-pointer"
+                            className="flex items-center justify-center py-3 bg-brand-cream/5 hover:bg-brand-cream/10 border border-brand-cream/10 rounded-lg transition duration-200 cursor-pointer"
                         >
-                            <svg className="h-5 w-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
+                            <svg className="h-4 w-4 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                             </svg>
                         </button>
                         <button
                             type="button"
                             onClick={() => handleSocialClick("Apple")}
-                            className="flex items-center justify-center py-3 bg-[#161618] hover:bg-[#27272a] border border-zinc-800 hover:border-zinc-700 rounded-lg transition duration-200 cursor-pointer"
+                            className="flex items-center justify-center py-3 bg-brand-cream/5 hover:bg-brand-cream/10 border border-brand-cream/10 rounded-lg transition duration-200 cursor-pointer"
                         >
-                            <svg className="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <svg className="h-4 w-4 text-brand-cream" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.22.67-2.94 1.5-.63.73-1.18 1.87-1.03 2.97 1.12.09 2.27-.56 2.98-1.41z"/>
                             </svg>
                         </button>
                     </div>
 
                     {/* Form Toggle Link */}
-                    <div className="text-center text-sm">
+                    <div className="text-center text-xs">
                         <button 
                             type="button" 
                             onClick={() => {
@@ -302,15 +302,15 @@ export function AuthForm() {
                                 resetLoginForm();
                                 resetSignupForm();
                             }} 
-                            className="text-zinc-500 hover:text-white transition duration-200"
+                            className="text-brand-silver hover:text-brand-cream transition duration-200 cursor-pointer"
                         >
                             {isLogin ? (
                                 <>
-                                    Don't have an account? <span className="text-[#f97316] font-medium hover:text-[#fb923c]">Sign up</span>
+                                    Don't have an account? <span className="text-brand-cobalt-light font-bold hover:underline">Sign up</span>
                                 </>
                             ) : (
                                 <>
-                                    Already have an account? <span className="text-[#f97316] font-medium hover:text-[#fb923c]">Sign in</span>
+                                    Already have an account? <span className="text-brand-cobalt-light font-bold hover:underline">Sign in</span>
                                 </>
                             )}
                         </button>
@@ -320,7 +320,7 @@ export function AuthForm() {
                     <button 
                         type="button" 
                         onClick={handleDemoLogin} 
-                        className="w-full text-center text-xs text-zinc-500 hover:text-zinc-300 transition duration-200 mt-2 underline decoration-zinc-800 cursor-pointer"
+                        className="w-full text-center text-xs text-brand-silver/60 hover:text-brand-cream transition duration-200 mt-2 underline decoration-brand-cream/10 cursor-pointer font-mono"
                         disabled={isLoading}
                     >
                         Access offline workspace (Demo mode)
@@ -328,22 +328,21 @@ export function AuthForm() {
                 </div>
 
                 {/* Footer Security Notice */}
-                <div className="flex items-center justify-center md:justify-start gap-2 text-xs text-zinc-600 mt-8 pt-4 border-t border-zinc-900">
+                <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] text-brand-silver/50 mt-8 pt-4 border-t border-brand-cream/5 font-mono">
                     <ShieldCheck className="h-4 w-4 text-emerald-500/80"/>
                     <span>SOC-2 compliant client-side data isolation</span>
                 </div>
             </div>
 
             {/* Right Pane: Premium Asset Display */}
-            <div className="relative hidden w-1/2 flex-col justify-between p-12 md:flex lg:w-[45%] h-screen overflow-hidden bg-[#09090b]">
+            <div className="relative hidden w-1/2 flex-col justify-between p-12 md:flex lg:w-[45%] h-screen overflow-hidden bg-brand-midnight">
                 {/* Decorative Canvas Wrapper */}
-                <div className="absolute inset-4 rounded-[2.5rem] overflow-hidden bg-[#121214] border border-white/5 flex flex-col justify-between p-10">
+                <div className="absolute inset-4 rounded-2xl overflow-hidden bg-brand-midnight-card border border-brand-cream/5 flex flex-col justify-between p-10">
                     {/* Glowing Mesh Gradients */}
-                    <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-teal-500/20 blur-[100px] pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-amber-500/15 blur-[100px] pointer-events-none" />
+                    <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-brand-cobalt/15 blur-[100px] pointer-events-none" />
                     
                     {/* Minimal Grid Layer */}
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none" />
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(251,250,247,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(251,250,247,0.01)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none" />
 
                     {/* Abstract Interactive/Floating Dashboard Mockups */}
                     <div className="relative flex-grow flex items-center justify-center opacity-90 scale-95 lg:scale-100 transition-all select-none">
@@ -353,31 +352,31 @@ export function AuthForm() {
                                 initial={{ y: 20, opacity: 0, rotate: -2 }}
                                 animate={{ y: 0, opacity: 1, rotate: -3 }}
                                 transition={{ duration: 0.8, delay: 0.2 }}
-                                className="absolute -top-6 -left-8 w-64 bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-2xl z-20"
+                                className="absolute -top-6 -left-8 w-64 bg-brand-midnight/90 backdrop-blur-xl border border-brand-cream/10 rounded-2xl p-5 shadow-2xl z-20"
                             >
                                 <div className="flex justify-between items-center mb-3">
-                                    <span className="text-xs text-zinc-400 font-medium">Net Worth</span>
-                                    <span className="text-[10px] bg-emerald-500/10 text-emerald-400 font-semibold px-2 py-0.5 rounded-full border border-emerald-500/20">+14.2%</span>
+                                    <span className="text-[10px] text-brand-silver font-bold uppercase tracking-wider">Net Worth</span>
+                                    <span className="text-[9px] bg-brand-cobalt/10 text-brand-cream font-bold px-2 py-0.5 rounded-full border border-brand-cobalt/20 font-mono">+14.2%</span>
                                 </div>
-                                <div className="text-2xl font-bold text-white mb-4">$324,850.00</div>
+                                <div className="text-xl font-bold text-brand-cream mb-4 font-mono">$324,850.00</div>
                                 
                                 {/* SVG Sparkline Chart */}
-                                <svg className="w-full h-16 text-teal-400" viewBox="0 0 100 30" fill="none">
+                                <svg className="w-full h-16 text-brand-cobalt-light" viewBox="0 0 100 30" fill="none">
                                     <path
                                         d="M0 25 C10 20, 20 28, 30 18 C40 8, 50 12, 60 5 C70 -2, 80 8, 90 2 C95 -1, 100 0, 100 0"
                                         stroke="currentColor"
-                                        strokeWidth="2.5"
+                                        strokeWidth="2"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                     />
                                     <path
                                         d="M0 25 C10 20, 20 28, 30 18 C40 8, 50 12, 60 5 C70 -2, 80 8, 90 2 C95 -1, 100 0, 100 0 L100 30 L0 30 Z"
                                         fill="url(#sparkline-grad)"
-                                        opacity="0.15"
+                                        opacity="0.1"
                                     />
                                     <defs>
                                         <linearGradient id="sparkline-grad" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="rgb(45, 212, 191)" />
+                                            <stop offset="0%" stopColor="#2b5cb8" />
                                             <stop offset="100%" stopColor="transparent" />
                                         </linearGradient>
                                     </defs>
@@ -389,18 +388,18 @@ export function AuthForm() {
                                 initial={{ y: 30, opacity: 0, rotate: 4 }}
                                 animate={{ y: 0, opacity: 1, rotate: 6 }}
                                 transition={{ duration: 0.8, delay: 0.4 }}
-                                className="absolute -right-4 top-10 w-56 bg-zinc-900/60 backdrop-blur-lg border border-white/5 rounded-2xl p-5 shadow-2xl z-10"
+                                className="absolute -right-4 top-10 w-56 bg-brand-midnight/70 backdrop-blur-lg border border-brand-cream/5 rounded-2xl p-5 shadow-2xl z-10"
                             >
-                                <span className="text-xs text-zinc-400 font-medium">Monthly Savings Target</span>
-                                <div className="text-xl font-bold text-white mt-1 mb-3">$4,500.00</div>
+                                <span className="text-[10px] text-brand-silver font-bold uppercase tracking-wider">Monthly Savings Target</span>
+                                <div className="text-lg font-bold text-brand-cream mt-1 mb-3 font-mono">$4,500.00</div>
                                 
                                 <div className="space-y-1">
-                                    <div className="flex justify-between text-[10px] text-zinc-400">
+                                    <div className="flex justify-between text-[9px] text-brand-silver font-bold font-mono">
                                         <span>Progress</span>
-                                        <span className="text-amber-400 font-semibold">82%</span>
+                                        <span className="text-brand-cobalt-light font-bold">82%</span>
                                     </div>
-                                    <div className="h-2 w-full bg-zinc-800 rounded-full overflow-hidden">
-                                        <div className="h-full w-[82%] bg-gradient-to-r from-amber-500 to-orange-500 rounded-full" />
+                                    <div className="h-1.5 w-full bg-brand-midnight rounded-full overflow-hidden">
+                                        <div className="h-full w-[82%] bg-brand-cobalt rounded-full" />
                                     </div>
                                 </div>
                             </motion.div>
@@ -410,18 +409,18 @@ export function AuthForm() {
                                 initial={{ y: 40, opacity: 0, rotate: -1 }}
                                 animate={{ y: 0, opacity: 1, rotate: 1 }}
                                 transition={{ duration: 0.8, delay: 0.6 }}
-                                className="absolute -bottom-8 left-12 w-64 bg-zinc-900/40 backdrop-blur-md border border-white/5 rounded-2xl p-4 shadow-2xl z-0"
+                                className="absolute -bottom-8 left-12 w-64 bg-brand-midnight/50 backdrop-blur-md border border-brand-cream/5 rounded-2xl p-4 shadow-2xl z-0"
                             >
-                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Quick Activity</span>
+                                <span className="text-[9px] text-brand-silver font-bold uppercase tracking-wider">Quick Activity</span>
                                 <div className="flex items-center gap-3 mt-3">
-                                    <div className="h-8 w-8 rounded-full bg-teal-500/10 flex items-center justify-center border border-teal-500/20">
-                                        <span className="text-xs font-semibold text-teal-400">AAPL</span>
+                                    <div className="h-8 w-8 rounded-lg bg-brand-cobalt/10 flex items-center justify-center border border-brand-cobalt/20">
+                                        <span className="text-[9px] font-bold text-brand-cobalt-light font-mono">AAPL</span>
                                     </div>
                                     <div className="flex-grow">
-                                        <div className="text-xs font-semibold text-white">Bought Apple Stock</div>
-                                        <div className="text-[10px] text-zinc-500">2 shares at $178.50</div>
+                                        <div className="text-xs font-semibold text-brand-cream">Bought Apple Stock</div>
+                                        <div className="text-[10px] text-brand-silver font-mono">2 shares at $178.50</div>
                                     </div>
-                                    <div className="text-xs font-semibold text-teal-400">-$357.00</div>
+                                    <div className="text-xs font-bold text-brand-cream font-mono">-$357.00</div>
                                 </div>
                             </motion.div>
                         </div>
@@ -431,22 +430,22 @@ export function AuthForm() {
                     <div className="relative z-20 space-y-4">
                         {/* Badges */}
                         <div className="flex items-center gap-2">
-                            <span className="bg-white/5 text-zinc-300 text-[11px] font-medium px-3 py-1.5 rounded-md border border-white/10">
+                            <span className="bg-brand-cream/5 text-brand-silver text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-brand-cream/10">
                                 Wealth Management
                             </span>
-                            <span className="bg-white/5 text-zinc-300 text-[11px] font-medium px-3 py-1.5 rounded-md border border-white/10">
+                            <span className="bg-brand-cream/5 text-brand-silver text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-brand-cream/10">
                                 Financial Analytics
                             </span>
                         </div>
 
                         {/* Testimonial Quote */}
-                        <div className="bg-zinc-900/60 backdrop-blur-xl border border-white/10 p-6 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                            <p className="text-sm text-zinc-200 leading-relaxed font-light">
+                        <div className="bg-brand-midnight/80 backdrop-blur-xl border border-brand-cream/10 p-6 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                            <p className="text-xs text-brand-silver leading-relaxed font-medium">
                                 "Finvest has completely transformed how I manage my investments. What used to take hours of manual spreadsheet tracking is now fully automated and beautifully visualized."
                             </p>
                             <div className="mt-4 flex flex-col">
-                                <span className="text-sm font-semibold text-white">Sarah Jenkins</span>
-                                <span className="text-xs text-zinc-500 mt-0.5">Founder, WealthyFlow</span>
+                                <span className="text-xs font-bold text-brand-cream">Sarah Jenkins</span>
+                                <span className="text-[10px] text-brand-silver/60 mt-0.5 font-mono">Founder, WealthyFlow</span>
                             </div>
                         </div>
                     </div>

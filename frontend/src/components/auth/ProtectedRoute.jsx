@@ -2,21 +2,22 @@ import { useAuth } from "../providers/auth-provider";
 import { AuthForm } from "./AuthForm";
 import { Landmark } from "lucide-react";
 import { motion } from "framer-motion";
+
 export function ProtectedRoute({ children }) {
     const { user, loading } = useAuth();
     if (loading) {
-        return (<div className="flex min-h-screen flex-col items-center justify-center bg-[#020617] text-slate-100">
+        return (<div className="flex min-h-screen flex-col items-center justify-center bg-brand-midnight text-brand-cream">
         <motion.div animate={{
-                scale: [1, 1.1, 1],
-                opacity: [0.3, 1, 0.3],
+                scale: [1, 1.05, 1],
+                opacity: [0.5, 1, 0.5],
             }} transition={{
-                duration: 2,
+                duration: 1.5,
                 repeat: Infinity,
                 ease: "easeInOut",
-            }} className="flex h-16 w-16 items-center justify-center rounded-[1.25rem] border border-cyan-400/30 bg-cyan-500/10 shadow-[0_12px_40px_rgba(34,211,238,0.18)]">
-          <Landmark className="h-8 w-8 text-cyan-300"/>
+            }} className="flex h-12 w-12 items-center justify-center rounded-xl border border-brand-cobalt/20 bg-brand-cobalt/10">
+          <Landmark className="h-6 w-6 text-brand-cobalt-light"/>
         </motion.div>
-        <span className="mt-4 text-xs font-semibold tracking-[0.3em] text-slate-500 uppercase">
+        <span className="mt-4 text-[10px] font-bold tracking-[0.25em] text-brand-silver uppercase font-mono">
           Loading workspace...
         </span>
       </div>);
