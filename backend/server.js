@@ -9,7 +9,9 @@ import budgetRoutes from './routes/budgets.js';
 import loanRoutes from './routes/loans.js';
 import savingsRoutes from './routes/savings.js';
 import { errorHandler, AppError } from './middleware/error.js';
+import dns from "node:dns";
 
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 // Handle uncaught exceptions before any other execution
 process.on('uncaughtException', (err) => {
   console.error('💥 UNCAUGHT EXCEPTION! Shutting down...');
@@ -21,7 +23,13 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/finvest';
+let MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/finvest';
+
+// Fallback to local MongoDB if Atlas connection string contains placeholders
+if (MONGODB_URI.includes('<username>') || MONGODB_URI.includes('<password>') || MONGODB_URI.includes('<cluster-url>')) {
+  console.warn('⚠️ MongoDB Atlas placeholders detected in MONGODB_URI. Falling back to local MongoDB.');
+  MONGODB_URI = 'mongodb://localhost:27017/finvest';
+}
 
 // Middleware
 app.use(cors());

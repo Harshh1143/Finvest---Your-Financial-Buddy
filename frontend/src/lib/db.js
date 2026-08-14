@@ -94,8 +94,8 @@ export const db = {
       try {
         const result = await authApi.register(name, email, password);
         setToken(result.token);
-        // Seed initial data for new users
-        await seedUserData();
+        // Seed initial data for new users (removed)
+        // await seedUserData();
         return { user: result.user, error: null };
       } catch (err) {
         return { user: null, error: err.message };
