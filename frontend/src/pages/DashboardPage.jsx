@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { 
   PiggyBank, Plus, ArrowUpRight, ArrowDownRight, Trash2, Edit3, Check, X,
-  Home, Utensils, Zap, ShoppingBag, Plane, Play, Coins, TrendingUp, Landmark, Activity
+  Home, Utensils, Zap, ShoppingBag, Plane, Play, Coins, TrendingUp, Landmark, Activity,
+  ChevronRight
 } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Shell } from "../components/layout/shell";
@@ -74,6 +76,21 @@ export function DashboardPage() {
   const [isEditingBudget, setIsEditingBudget] = useState(false);
   const [newBudgetAmount, setNewBudgetAmount] = useState("");
   const [depositValues, setDepositValues] = useState({});
+  const [isOnboardingDismissed, setIsOnboardingDismissed] = useState(false);
+
+  useEffect(() => {
+    if (user?.id) {
+      const dismissed = localStorage.getItem(`finvest_onboarding_dismissed_${user.id}`) === "true";
+      setIsOnboardingDismissed(dismissed);
+    }
+  }, [user?.id]);
+
+  const handleDismissOnboarding = () => {
+    if (user?.id) {
+      localStorage.setItem(`finvest_onboarding_dismissed_${user.id}`, "true");
+    }
+    setIsOnboardingDismissed(true);
+  };
 
   // Queries
   const { data: transactions = [], isLoading: isTxLoading } = useQuery({
@@ -289,6 +306,9 @@ export function DashboardPage() {
         { name: "Bonds", value: 15 }
       ];
 
+  const isDataEmpty = transactions.length === 0 && portfolio.length === 0 && loans.length === 0 && savings.length === 0;
+  const showOnboarding = !isOnboardingDismissed && isDataEmpty;
+
   return (
     <Shell>
       <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 relative min-h-screen">
@@ -316,6 +336,136 @@ export function DashboardPage() {
             Record Transaction
           </Button>
         </div>
+
+        {/* Onboarding Guide */}
+        {showOnboarding && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8 relative rounded-2xl border border-brand-cobalt/20 bg-brand-midnight-card/85 p-6 lg:p-8 overflow-hidden shadow-2xl z-10"
+          >
+            {/* Ambient subtle cobalt backdrop */}
+            <div className="absolute top-0 right-0 w-60 h-60 bg-brand-cobalt/5 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+              <div className="space-y-2 max-w-2xl">
+                <div className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-brand-cobalt-light animate-pulse" />
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-brand-cobalt-light font-mono">
+                    Workspace Initialization
+                  </span>
+                </div>
+                <h2 className="text-xl font-extrabold tracking-tight text-brand-cream">
+                  Set up your core workspace features
+                </h2>
+                <p className="text-xs text-brand-silver leading-relaxed">
+                  To experience the full capability of Finvest, initialize your dashboard by setting up your active portfolios, budget parameters, and savings targets. You can manage these at any time.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 self-end md:self-start">
+                <Button
+                  onClick={handleDismissOnboarding}
+                  variant="outline"
+                  className="py-2.5 px-4 text-xs font-semibold text-brand-silver border-brand-cream/10 bg-transparent hover:text-brand-cream hover:bg-brand-cream/5 rounded-lg transition"
+                >
+                  Do it later
+                </Button>
+              </div>
+            </div>
+
+            {/* Quickstart Actions Grid */}
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 border-t border-brand-cream/5 pt-6 relative z-20">
+              
+              {/* Feature 1: Portfolio Assets */}
+              <Link to="/portfolio" className="group block">
+                <div className="rounded-xl border border-brand-cream/5 bg-brand-cream/5 p-4 hover:border-brand-cobalt/35 hover:bg-brand-cream/10 transition-all duration-200 h-full flex flex-col justify-between cursor-pointer">
+                  <div className="space-y-2">
+                    <div className="w-8 h-8 rounded-lg bg-brand-cobalt/10 border border-brand-cobalt/20 text-brand-cobalt-light flex items-center justify-center">
+                      <TrendingUp className="h-4.5 w-4.5" />
+                    </div>
+                    <h3 className="text-xs font-bold text-brand-cream group-hover:text-brand-cobalt-light transition">
+                      Configure Portfolio Assets
+                    </h3>
+                    <p className="text-[10px] text-brand-silver/70 leading-normal">
+                      Connect stocks, crypto, gold, or custom equities.
+                    </p>
+                  </div>
+                  <span className="text-[9px] font-bold tracking-wider text-brand-cobalt-light uppercase font-mono mt-4 inline-flex items-center gap-1.5">
+                    Open Portfolio <ChevronRight className="h-3 w-3 stroke-[2.5]" />
+                  </span>
+                </div>
+              </Link>
+
+              {/* Feature 2: Savings Goal */}
+              <button 
+                onClick={() => setIsAddGoalOpen(true)} 
+                className="group block text-left w-full cursor-pointer bg-transparent border-0 p-0"
+              >
+                <div className="rounded-xl border border-brand-cream/5 bg-brand-cream/5 p-4 hover:border-brand-cobalt/35 hover:bg-brand-cream/10 transition-all duration-200 h-full flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="w-8 h-8 rounded-lg bg-brand-cobalt/10 border border-brand-cobalt/20 text-brand-cobalt-light flex items-center justify-center">
+                      <PiggyBank className="h-4.5 w-4.5" />
+                    </div>
+                    <h3 className="text-xs font-bold text-brand-cream group-hover:text-brand-cobalt-light transition">
+                      Add Savings Goal
+                    </h3>
+                    <p className="text-[10px] text-brand-silver/70 leading-normal">
+                      Set target objectives and automate deposits.
+                    </p>
+                  </div>
+                  <span className="text-[9px] font-bold tracking-wider text-brand-cobalt-light uppercase font-mono mt-4 inline-flex items-center gap-1.5">
+                    Create Goal <ChevronRight className="h-3 w-3 stroke-[2.5]" />
+                  </span>
+                </div>
+              </button>
+
+              {/* Feature 3: Record Transaction */}
+              <button 
+                onClick={() => setIsAddTxOpen(true)} 
+                className="group block text-left w-full cursor-pointer bg-transparent border-0 p-0"
+              >
+                <div className="rounded-xl border border-brand-cream/5 bg-brand-cream/5 p-4 hover:border-brand-cobalt/35 hover:bg-brand-cream/10 transition-all duration-200 h-full flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="w-8 h-8 rounded-lg bg-brand-cobalt/10 border border-brand-cobalt/20 text-brand-cobalt-light flex items-center justify-center">
+                      <Plus className="h-4.5 w-4.5" />
+                    </div>
+                    <h3 className="text-xs font-bold text-brand-cream group-hover:text-brand-cobalt-light transition">
+                      Log First Transaction
+                    </h3>
+                    <p className="text-[10px] text-brand-silver/70 leading-normal">
+                      Record income cashflow or daily outflow expenses.
+                    </p>
+                  </div>
+                  <span className="text-[9px] font-bold tracking-wider text-brand-cobalt-light uppercase font-mono mt-4 inline-flex items-center gap-1.5">
+                    Record flow <ChevronRight className="h-3 w-3 stroke-[2.5]" />
+                  </span>
+                </div>
+              </button>
+
+              {/* Feature 4: Liabilities & Loans */}
+              <Link to="/loans" className="group block">
+                <div className="rounded-xl border border-brand-cream/5 bg-brand-cream/5 p-4 hover:border-brand-cobalt/35 hover:bg-brand-cream/10 transition-all duration-200 h-full flex flex-col justify-between cursor-pointer">
+                  <div className="space-y-2">
+                    <div className="w-8 h-8 rounded-lg bg-brand-cobalt/10 border border-brand-cobalt/20 text-brand-cobalt-light flex items-center justify-center">
+                      <Landmark className="h-4.5 w-4.5" />
+                    </div>
+                    <h3 className="text-xs font-bold text-brand-cream group-hover:text-brand-cobalt-light transition">
+                      Track Active Loans
+                    </h3>
+                    <p className="text-[10px] text-brand-silver/70 leading-normal">
+                      Keep track of student loans, mortgages, or EMI details.
+                    </p>
+                  </div>
+                  <span className="text-[9px] font-bold tracking-wider text-brand-cobalt-light uppercase font-mono mt-4 inline-flex items-center gap-1.5">
+                    Manage Debts <ChevronRight className="h-3 w-3 stroke-[2.5]" />
+                  </span>
+                </div>
+              </Link>
+
+            </div>
+          </motion.div>
+        )}
 
         {/* Top KPIs */}
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4 relative z-10">
