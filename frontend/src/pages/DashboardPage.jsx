@@ -163,8 +163,8 @@ export function DashboardPage() {
       queryClient.invalidateQueries({ queryKey: ["savings", user?.id] });
       toast.success("Savings goal created successfully!");
     },
-    onError: () => {
-      toast.error("Failed to create savings goal.");
+    onError: (error) => {
+      toast.error(error.message || "Failed to create savings goal.");
     },
   });
 

@@ -13,15 +13,14 @@ import { db } from "../lib/db";
 import { useAuth } from "../components/providers/auth-provider";
 import { toast } from "sonner";
 import { formatCurrency, getCurrencySymbol } from "../lib/currency";
+import axios from "axios";
 
-const DEFAULT_ASSETS_INFO = {
+const STATIC_ASSETS_INFO = {
   AAPL: { name: "Apple Inc.", price: 214.83, change: "+1.84%", type: "Stocks" },
   MSFT: { name: "Microsoft Corp.", price: 415.55, change: "+0.92%", type: "Stocks" },
   NVDA: { name: "NVIDIA Corp.", price: 122.60, change: "+4.12%", type: "Stocks" },
   TSLA: { name: "Tesla Inc.", price: 187.44, change: "-2.15%", type: "Stocks" },
   AMD: { name: "Advanced Micro Devices", price: 156.32, change: "+1.05%", type: "Stocks" },
-  BTC: { name: "Bitcoin", price: 64250.00, change: "+3.25%", type: "Cryptocurrency" },
-  ETH: { name: "Ethereum", price: 3450.00, change: "+2.11%", type: "Cryptocurrency" },
   GLD: { name: "SPDR Gold Shares", price: 224.50, change: "+0.45%", type: "Gold & Precious Metals" },
 };
 
@@ -76,13 +75,60 @@ export function PortfolioPage() {
     enabled: !!user?.id,
   });
 
+  const { data: cryptoCoins = [] } = useQuery({
+    queryKey: ["coingeckoCrypto"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("https://api.coingecko.com/api/v3/coins/markets", {
+          params: {
+            vs_currency: "usd",
+            order: "market_cap_desc",
+            per_page: 25,
+            page: 1,
+            sparkline: false
+          }
+        });
+        return response.data.map(coin => ({
+          symbol: coin.symbol.toUpperCase(),
+          name: coin.name,
+          price: coin.current_price,
+          change: (coin.price_change_percentage_24h >= 0 ? "+" : "") + (coin.price_change_percentage_24h || 0).toFixed(2) + "%",
+          type: "Cryptocurrency"
+        }));
+      } catch (err) {
+        console.error("CoinGecko API error, falling back to static crypto:", err);
+        return [
+          { symbol: "BTC", name: "Bitcoin", price: 64250.00, change: "+3.25%", type: "Cryptocurrency" },
+          { symbol: "ETH", name: "Ethereum", price: 3450.00, change: "+2.11%", type: "Cryptocurrency" },
+          { symbol: "SOL", name: "Solana", price: 145.20, change: "+5.12%", type: "Cryptocurrency" },
+          { symbol: "ADA", name: "Cardano", price: 0.38, change: "-1.05%", type: "Cryptocurrency" },
+          { symbol: "DOT", name: "Polkadot", price: 6.25, change: "+0.85%", type: "Cryptocurrency" },
+        ];
+      }
+    },
+    staleTime: 60000,
+  });
+
+  const assetsCatalog = useMemo(() => {
+    const catalog = { ...STATIC_ASSETS_INFO };
+    cryptoCoins.forEach(coin => {
+      catalog[coin.symbol] = {
+        name: coin.name,
+        price: coin.price,
+        change: coin.change,
+        type: coin.type
+      };
+    });
+    return catalog;
+  }, [cryptoCoins]);
+
   // Mutations
   const addAssetMutation = useMutation({
     mutationFn: (newAsset) => db.portfolio.add(user.id, newAsset),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["portfolio", user?.id] });
       setQuantity("10");
-      setPurchasePrice(selectedTicker !== "CUSTOM" ? DEFAULT_ASSETS_INFO[selectedTicker]?.price.toString() : "");
+      setPurchasePrice(selectedTicker !== "CUSTOM" ? assetsCatalog[selectedTicker]?.price.toString() : "");
       toast.success("Position added to portfolio successfully!");
     },
     onError: () => {
@@ -117,11 +163,11 @@ export function PortfolioPage() {
   // Filtered search results
   const searchResults = useMemo(() => {
     const q = searchQuery.toUpperCase();
-    if (!q) return Object.keys(DEFAULT_ASSETS_INFO);
-    return Object.keys(DEFAULT_ASSETS_INFO).filter((ticker) => 
-      ticker.includes(q) || DEFAULT_ASSETS_INFO[ticker].name.toUpperCase().includes(q)
+    if (!q) return Object.keys(assetsCatalog);
+    return Object.keys(assetsCatalog).filter((ticker) => 
+      ticker.includes(q) || assetsCatalog[ticker].name.toUpperCase().includes(q)
     );
-  }, [searchQuery]);
+  }, [searchQuery, assetsCatalog]);
 
   // Selected asset detail
   const currentAssetInfo = useMemo(() => {
@@ -136,16 +182,16 @@ export function PortfolioPage() {
     }
     return {
       symbol: selectedTicker,
-      ...DEFAULT_ASSETS_INFO[selectedTicker],
+      ...assetsCatalog[selectedTicker],
     };
-  }, [selectedTicker, customTicker, customName, customType, purchasePrice]);
+  }, [selectedTicker, customTicker, customName, customType, purchasePrice, assetsCatalog]);
 
   // Set default buy price when stock selection changes
   useEffect(() => {
     if (selectedTicker !== "CUSTOM") {
-      setPurchasePrice(DEFAULT_ASSETS_INFO[selectedTicker]?.price.toString() || "");
+      setPurchasePrice(assetsCatalog[selectedTicker]?.price.toString() || "");
     }
-  }, [selectedTicker]);
+  }, [selectedTicker, assetsCatalog]);
 
   // Calculations for total stats
   const totalValue = useMemo(() => portfolio.reduce((sum, item) => sum + item.totalValue, 0), [portfolio]);
@@ -283,7 +329,7 @@ export function PortfolioPage() {
 
               <div className="grid gap-2.5 max-h-60 overflow-y-auto pr-1">
                 {searchResults.map((ticker) => {
-                  const asset = DEFAULT_ASSETS_INFO[ticker];
+                  const asset = assetsCatalog[ticker];
                   const isSelected = selectedTicker === ticker;
                   return (
                     <button 

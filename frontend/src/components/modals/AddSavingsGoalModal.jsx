@@ -9,10 +9,11 @@ const schema = z.object({
     name: z.string().min(1, "Please provide a goal name"),
     target_amount: z.coerce.number().positive("Target amount must be a positive number"),
     target_date: z.string().min(1, "Please select a target date").refine((val) => {
-        const selectedDate = new Date(val);
+        const [year, month, day] = val.split("-").map(Number);
+        const selectedDateUTC = Date.UTC(year, month - 1, day);
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return selectedDate >= today;
+        const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+        return selectedDateUTC >= todayUTC;
     }, {
         message: "Target date cannot be in the past",
     }),

@@ -21,10 +21,13 @@ router.post('/', asyncHandler(async (req, res, next) => {
     return next(new AppError('Please provide all required fields: name, targetAmount, targetDate, category', 400));
   }
 
-  const selectedDate = new Date(targetDate);
+  const [year, month, day] = targetDate.split('-').map(Number);
+  const selectedDate = new Date(Date.UTC(year, month - 1, day));
+  
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  if (selectedDate < today) {
+  const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+  
+  if (selectedDate < todayUTC) {
     return next(new AppError('Target date cannot be in the past', 400));
   }
 
