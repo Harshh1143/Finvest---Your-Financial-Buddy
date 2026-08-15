@@ -219,7 +219,6 @@ export function HomePage() {
   const heroRef = useRef(null);
   const featuresRef = useRef(null);
   const sandboxRef = useRef(null);
-  const pricingRef = useRef(null);
   const faqRef = useRef(null);
 
   // Background Ambient Glow Movement
@@ -350,8 +349,7 @@ export function HomePage() {
     }, 10);
   };
 
-  // --- STATE FOR PRICING SECTION ---
-  const [isAnnual, setIsAnnual] = useState(true);
+
 
   // --- STATE FOR FAQ SECTION ---
   const [openFaq, setOpenFaq] = useState(null);
@@ -971,146 +969,7 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* ==================================================
-            PRICING TIER SECTION
-            ================================================== */}
-        <section id="pricing" ref={pricingRef} className="mx-auto max-w-7xl px-6 py-24 lg:px-8 z-10 relative border-t border-brand-cream/5 bg-brand-midnight-card/5">
-          
-          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.25em] text-brand-cobalt-light font-mono">
-              TRANSPARENT PRICING
-            </h2>
-            <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-brand-cream">
-              One software. Unlocked.
-            </p>
-            <p className="text-base text-brand-silver">
-              Select the allocation matching your capital requirements. No hidden commissions, ever.
-            </p>
 
-            {/* Toggle switch */}
-            <div className="flex items-center justify-center gap-4 pt-6">
-              <span className={`text-xs font-semibold font-mono ${!isAnnual ? "text-brand-cream" : "text-brand-silver"}`}>Monthly</span>
-              <button 
-                onClick={() => setIsAnnual(!isAnnual)}
-                className="w-10 h-5 bg-brand-midnight-card border border-brand-cream/10 rounded-full p-0.5 relative flex items-center transition"
-              >
-                <div 
-                  className={`w-3.5 h-3.5 rounded-full bg-brand-cobalt transition-transform ${
-                    isAnnual ? "translate-x-5" : "translate-x-0"
-                  }`} 
-                />
-              </button>
-              <span className={`text-xs font-semibold font-mono ${isAnnual ? "text-brand-cream" : "text-brand-silver"} flex items-center gap-1.5`}>
-                Annual <span className="bg-emerald-500/10 text-emerald-400 text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-emerald-500/20">Save 20%</span>
-              </span>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            
-            {/* Free Tier */}
-            <div className="glass-card rounded-2xl p-8 border-brand-cream/5 flex flex-col justify-between relative hover:border-brand-cream/10 transition duration-300">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold text-brand-cream font-mono">Starter Account</h3>
-                  <p className="text-[10px] text-brand-silver font-bold uppercase font-mono mt-1">BASIC MONITORING</p>
-                </div>
-                
-                <div className="flex items-baseline text-brand-cream">
-                  <span className="text-5xl font-extrabold tracking-tight font-mono">$0</span>
-                  <span className="text-brand-silver text-xs ml-2">/ month</span>
-                </div>
-                
-                <p className="text-brand-silver text-xs leading-relaxed">
-                  Perfect to get structured, calm visibility into your asset net worth, loan trackers, and basic budgeting.
-                </p>
-
-                <div className="border-t border-brand-cream/5 pt-6 space-y-3.5 text-xs text-brand-silver font-medium">
-                  <div className="flex items-center gap-3">
-                    <Check className="h-4 w-4 text-brand-cobalt-light" />
-                    <span>Sync up to 3 bank accounts</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="h-4 w-4 text-brand-cobalt-light" />
-                    <span>Basic EMI Loan Calculator</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="h-4 w-4 text-brand-cobalt-light" />
-                    <span>Manual asset value updates</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-brand-silver/30 line-through">
-                    <Check className="h-4 w-4" />
-                    <span>AI financial allocation advice</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8">
-                <Link to="/dashboard" className="w-full block">
-                  <Button variant="outline" className="w-full bg-brand-cream/5 border-brand-cream/10 text-brand-cream font-semibold">
-                    Get Started Free
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            {/* Pro Tier */}
-            <div className="glass-card rounded-2xl p-8 border-brand-cobalt/35 bg-brand-cobalt/5 flex flex-col justify-between relative shadow-[0_0_40px_rgba(43,92,184,0.05)] hover:border-brand-cobalt/50 transition duration-300">
-              <div className="absolute top-0 right-8 -translate-y-1/2 bg-brand-cobalt text-brand-cream text-[9px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider font-mono">
-                PRO ACTIVE
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold text-brand-cream flex items-center gap-2 font-mono">
-                    Pro Workspace
-                    <Sparkles className="h-4 w-4 text-brand-cobalt-light animate-pulse" />
-                  </h3>
-                  <p className="text-[10px] text-brand-cobalt-light font-bold uppercase font-mono mt-1">UNLIMITED WEALTH OPERATING SYSTEM</p>
-                </div>
-                
-                <div className="flex items-baseline text-brand-cream">
-                  <span className="text-5xl font-extrabold tracking-tight font-mono">
-                    ${isAnnual ? "12" : "15"}
-                  </span>
-                  <span className="text-brand-silver text-xs ml-2">/ month</span>
-                </div>
-                
-                <p className="text-brand-silver text-xs leading-relaxed">
-                  Complete automated financial workspace. Sync all your asset portfolios, liabilities, and leverage advanced AI planning sweeps.
-                </p>
-
-                <div className="border-t border-brand-cobalt/15 pt-6 space-y-3.5 text-xs text-brand-silver">
-                  <div className="flex items-center gap-3">
-                    <Check className="h-4 w-4 text-brand-cobalt-light" />
-                    <span className="font-semibold text-brand-cream">Unlimited bank accounts sync</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="h-4 w-4 text-brand-cobalt-light" />
-                    <span>Real-time cryptocurrency portfolio feeds</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="h-4 w-4 text-brand-cobalt-light" />
-                    <span>Interactive EMI & Compound growth simulators</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="h-4 w-4 text-brand-cobalt-light" />
-                    <span className="text-brand-cream font-bold">Uncapped AI Insights sweeps</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8">
-                <Link to="/dashboard" className="w-full block">
-                  <Button className="w-full bg-brand-cobalt text-brand-cream font-semibold hover:bg-brand-cobalt-light">
-                    Upgrade to Pro
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-          </div>
-        </section>
 
         {/* ==================================================
             FAQ SECTION

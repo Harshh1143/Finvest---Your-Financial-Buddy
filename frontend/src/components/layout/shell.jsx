@@ -16,7 +16,6 @@ export function Shell({ children }) {
         : [
             { label: "Features", href: "#product" },
             { label: "Sandbox", href: "#sandbox" },
-            { label: "Pricing", href: "#pricing" },
             { label: "FAQ", href: "#faq" },
         ];
 
