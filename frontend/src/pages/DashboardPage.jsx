@@ -210,11 +210,11 @@ export function DashboardPage() {
   const savingsValue = savings.reduce((sum, item) => sum + item.currentAmount, 0);
   const loansValue = loans.reduce((sum, item) => sum + item.remaining, 0);
 
-  // Cash Balance: Seed Cash 15,000 + income - expenses
+  // Cash Balance: income - expenses
   const netCashFlow = transactions.reduce((sum, t) => {
     return t.type === "income" ? sum + t.amount : sum - t.amount;
   }, 0);
-  const cashBalance = Math.max(0, 15000 + netCashFlow);
+  const cashBalance = Math.max(0, netCashFlow);
   const netWorth = cashBalance + portfolioValue + savingsValue - loansValue;
 
   // Monthly expense calculation
@@ -227,7 +227,7 @@ export function DashboardPage() {
     {
       title: "Net worth",
       value: `$${netWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      change: netWorth >= 15000 ? "+14.2%" : "-2.5%",
+      change: netWorth === 0 ? "0.0%" : (netWorth > 0 ? "+14.2%" : "-2.5%"),
       detail: "Assets vs Liabilities",
       type: "net-worth",
       icon: PiggyBank,
