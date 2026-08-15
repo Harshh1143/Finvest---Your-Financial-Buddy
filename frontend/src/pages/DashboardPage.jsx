@@ -510,7 +510,7 @@ export function DashboardPage() {
                       <div className="pt-4 flex-1 flex flex-col justify-end">
                         <div className="flex gap-2">
                           <div className="relative flex-1">
-                            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-brand-silver font-mono">$</span>
+                            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-brand-silver font-mono">{getCurrencySymbol(user)}</span>
                             <input 
                               type="number" 
                               placeholder="Limit" 
@@ -556,7 +556,7 @@ export function DashboardPage() {
                               <CardTitle className="text-[10px] font-bold uppercase tracking-wider text-brand-silver">{item.title}</CardTitle>
                               <CardDescription className="text-[10px] font-mono text-brand-silver/65 mt-0.5">
                                 {budgetData?.monthlyBudget
-                                  ? `Limit: $${budgetData.monthlyBudget.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                                  ? `Limit: ${formatCurrency(budgetData.monthlyBudget, user)}`
                                   : "No limit set"}
                               </CardDescription>
                             </div>
@@ -564,7 +564,9 @@ export function DashboardPage() {
                           <button 
                             onClick={() => {
                               setIsEditingBudget(true);
-                              setNewBudgetAmount(budgetData?.monthlyBudget ? budgetData.monthlyBudget.toString() : "");
+                              const userCurrency = user?.settings?.currency || 'USD';
+                              const rate = exchangeRates[userCurrency] || 1;
+                              setNewBudgetAmount(budgetData?.monthlyBudget ? (budgetData.monthlyBudget * rate).toFixed(2) : "");
                             }} 
                             className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-brand-silver hover:text-brand-cream p-1.5 rounded-lg bg-brand-cream/5 border border-brand-cream/10 cursor-pointer flex items-center justify-center" 
                             title="Edit Budget Limit"

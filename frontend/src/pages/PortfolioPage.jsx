@@ -12,7 +12,7 @@ import { Shell } from "../components/layout/shell";
 import { db } from "../lib/db";
 import { useAuth } from "../components/providers/auth-provider";
 import { toast } from "sonner";
-import { formatCurrency, getCurrencySymbol } from "../lib/currency";
+import { formatCurrency, getCurrencySymbol, exchangeRates } from "../lib/currency";
 import axios from "axios";
 
 const STATIC_ASSETS_INFO = {
@@ -188,10 +188,13 @@ export function PortfolioPage() {
 
   // Set default buy price when stock selection changes
   useEffect(() => {
-    if (selectedTicker !== "CUSTOM") {
-      setPurchasePrice(assetsCatalog[selectedTicker]?.price.toString() || "");
+    if (selectedTicker !== "CUSTOM" && assetsCatalog[selectedTicker]) {
+      const userCurrency = user?.settings?.currency || 'USD';
+      const rate = exchangeRates[userCurrency] || 1;
+      const convertedPrice = assetsCatalog[selectedTicker].price * rate;
+      setPurchasePrice(convertedPrice.toFixed(2));
     }
-  }, [selectedTicker, assetsCatalog]);
+  }, [selectedTicker, assetsCatalog, user]);
 
   // Calculations for total stats
   const totalValue = useMemo(() => portfolio.reduce((sum, item) => sum + item.totalValue, 0), [portfolio]);
@@ -220,20 +223,28 @@ export function PortfolioPage() {
   const handleAddAsset = async (e) => {
     e.preventDefault();
     if (!user?.id) return;
+    const userCurrency = user?.settings?.currency || 'USD';
+    const rate = exchangeRates[userCurrency] || 1;
+
+    const normalizedPurchasePrice = (parseFloat(purchasePrice) || (selectedTicker !== "CUSTOM" ? assetsCatalog[selectedTicker]?.price : 0)) / rate;
+    const normalizedCurrentPrice = (selectedTicker === "CUSTOM" ? normalizedPurchasePrice : (assetsCatalog[selectedTicker]?.price || 0));
+
     const payload = {
       name: currentAssetInfo.name,
       symbol: currentAssetInfo.symbol.toUpperCase(),
       assetType: currentAssetInfo.type,
-      currentPrice: currentAssetInfo.price,
+      currentPrice: normalizedCurrentPrice,
       quantity: parseFloat(quantity) || 0,
-      purchasePrice: parseFloat(purchasePrice) || currentAssetInfo.price,
+      purchasePrice: normalizedPurchasePrice,
       purchaseDate: purchaseDate,
     };
     await addAssetMutation.mutateAsync(payload);
   };
 
   const handleUpdatePrice = async (assetId) => {
-    const price = parseFloat(editingPrice);
+    const userCurrency = user?.settings?.currency || 'USD';
+    const rate = exchangeRates[userCurrency] || 1;
+    const price = parseFloat(editingPrice) / rate;
     if (!isNaN(price) && price > 0) {
       await updatePriceMutation.mutateAsync({ assetId, currentPrice: price });
     } else {
@@ -452,7 +463,7 @@ export function PortfolioPage() {
                   <div className="text-right">
                     <p className="text-[10px] font-bold text-brand-silver uppercase tracking-wider font-mono">Market rate</p>
                     <p className="text-xl font-bold text-brand-cobalt-light mt-1.5 font-mono">
-                      ${currentAssetInfo.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {formatCurrency(currentAssetInfo.price, user)}
                     </p>
                   </div>
                 </div>
@@ -484,13 +495,13 @@ export function PortfolioPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-brand-silver block">Purchase Price ($)</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-brand-silver block">Purchase Price ({getCurrencySymbol(user)})</label>
                   <input 
                     id="purchase-price-input"
                     type="number" 
                     step="0.01" 
                     className="w-full rounded-lg border border-brand-cream/10 bg-brand-midnight px-3.5 py-3 text-xs text-brand-cream outline-none focus:border-brand-cobalt transition font-mono" 
-                    placeholder={`e.g. ${currentAssetInfo.price}`} 
+                    placeholder={`e.g. ${(currentAssetInfo.price * (exchangeRates[user?.settings?.currency || 'USD'] || 1)).toFixed(2)}`} 
                     value={purchasePrice} 
                     onChange={(e) => setPurchasePrice(e.target.value)} 
                     required
@@ -700,8 +711,10 @@ export function PortfolioPage() {
                                 <span>{formatCurrency(asset.currentPrice, user)}</span>
                                 <button 
                                   onClick={() => {
+                                    const userCurrency = user?.settings?.currency || 'USD';
+                                    const rate = exchangeRates[userCurrency] || 1;
                                     setEditingAssetId(asset._id);
-                                    setEditingPrice(asset.currentPrice.toString());
+                                    setEditingPrice((asset.currentPrice * rate).toFixed(2));
                                   }} 
                                   className="text-brand-silver hover:text-brand-cream p-1 rounded hover:bg-brand-cream/5 transition"
                                 >
