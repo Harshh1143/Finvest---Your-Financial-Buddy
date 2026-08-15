@@ -496,7 +496,7 @@ export function LoansPage() {
                                         ["Total paid off", formatCurrency(totalPaid, user)],
                                         ["Total interest paid", formatCurrency(totalInterestPaid, user)],
                                         ["Next payment due", formatNextDue(nextDueDate)],
-                                    ].map(([label, value]) => ((
+                                    ].map(([label, value]) => (
                                         <div key={label} className="flex items-center justify-between rounded-xl border border-brand-cream/5 bg-brand-cream/5 px-4.5 py-3.5 hover:border-brand-cobalt/20 transition-all duration-200">
                                             <span className="text-xs font-semibold text-brand-silver">{label}</span>
                                             <span className="font-bold text-brand-cream text-xs font-mono">{value}</span>
