@@ -44,8 +44,23 @@ app.use('/api/loans', loanRoutes);
 app.use('/api/savings', savingsRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get(['/health', '/api/health'], (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const dbStatus = dbState === 1 ? 'up' : 'down';
+  
+  if (dbState !== 1) {
+    return res.status(503).json({
+      status: 'error',
+      database: dbStatus,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  res.json({
+    status: 'ok',
+    database: dbStatus,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Fallback for unhandled routes
