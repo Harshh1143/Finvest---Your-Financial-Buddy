@@ -13,7 +13,7 @@ import { db } from "../lib/db";
 import { useAuth } from "../components/providers/auth-provider";
 import { AddLoanModal } from "../components/modals/AddLoanModal";
 import { toast } from "sonner";
-import { formatCurrency, getCurrencySymbol } from "../lib/currency";
+import { formatCurrency, getCurrencySymbol, exchangeRates } from "../lib/currency";
 
 export function LoansPage() {
     const { user } = useAuth();
@@ -47,7 +47,9 @@ export function LoansPage() {
     // Mutations
     const addLoanMutation = useMutation({
         mutationFn: (newLoan) => {
-            const p = parseFloat(newLoan.principal);
+            const userCurrency = user?.settings?.currency || 'USD';
+            const rate = exchangeRates[userCurrency] || 1;
+            const p = parseFloat(newLoan.principal) / rate;
             const r = parseFloat(newLoan.rate) / 12 / 100;
             const n = parseInt(newLoan.tenure_months);
             const emi = r === 0 ? p / n : (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
@@ -77,7 +79,12 @@ export function LoansPage() {
     });
 
     const payEMIMutation = useMutation({
-        mutationFn: ({ loanId, extraPayment }) => db.loans.payEMI(user.id, loanId, extraPayment),
+        mutationFn: ({ loanId, extraPayment }) => {
+            const userCurrency = user?.settings?.currency || 'USD';
+            const rate = exchangeRates[userCurrency] || 1;
+            const extraUSD = parseFloat(extraPayment || 0) / rate;
+            return db.loans.payEMI(user.id, loanId, extraUSD);
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["loans", user?.id] });
             setPayingLoanId(null);
@@ -370,7 +377,7 @@ export function LoansPage() {
                                                                 <div className="flex gap-2">
                                                                     <input 
                                                                         type="number" 
-                                                                        placeholder="Extra prepayment ($)" 
+                                                                        placeholder={`Extra prepayment (${getCurrencySymbol(user)})`} 
                                                                         value={extraPayment} 
                                                                         onChange={(e) => setExtraPayment(e.target.value)} 
                                                                         className="flex-1 rounded-lg border border-brand-cream/10 bg-brand-midnight px-3 py-2 text-xs text-brand-cream placeholder-brand-silver/30 outline-none focus:border-brand-cobalt transition font-mono"

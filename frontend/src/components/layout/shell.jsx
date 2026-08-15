@@ -1,10 +1,11 @@
-import { Landmark, ShieldCheck, Sparkles, LogOut, User, LayoutDashboard, Briefcase, Percent } from "lucide-react";
+import { Landmark, ShieldCheck, Sparkles, LogOut, User, LayoutDashboard, Briefcase, Percent, Globe } from "lucide-react";
 import { Button } from "../ui/button";
 import { useAuth } from "../providers/auth-provider";
 import { Link, useLocation } from "react-router-dom";
+import { toast } from "sonner";
 
 export function Shell({ children }) {
-    const { user, signOut } = useAuth();
+    const { user, signOut, updateProfile } = useAuth();
     const location = useLocation();
     const isAppView = ["/dashboard", "/portfolio", "/loans", "/profile"].includes(location.pathname);
     const navItems = isAppView
@@ -61,8 +62,41 @@ export function Shell({ children }) {
                 <div className="flex items-center gap-4">
                     {isAppView ? (
                         user && (
-                            <div className="flex items-center gap-3">
-                                <Link to="/profile" className="flex items-center gap-3 hover:opacity-80 transition cursor-pointer">
+                            <div className="flex items-center gap-4">
+                                {/* Global Currency Selector Dropdown */}
+                                <div className="flex items-center gap-1.5">
+                                    <Globe className="h-3.5 w-3.5 text-brand-cobalt-light" />
+                                    <select
+                                        id="global-currency-selector"
+                                        value={user.settings?.currency || "USD"}
+                                        onChange={async (e) => {
+                                            try {
+                                                await updateProfile({
+                                                    settings: {
+                                                        ...user.settings,
+                                                        currency: e.target.value
+                                                    }
+                                                });
+                                                toast.success(`Currency switched to ${e.target.value}`);
+                                            } catch (err) {
+                                                toast.error("Failed to update currency setting");
+                                            }
+                                        }}
+                                        className="bg-brand-cream/5 border border-brand-cream/10 hover:border-brand-cobalt/35 text-[11px] font-semibold text-brand-cream rounded-lg py-1.5 px-2.5 outline-none cursor-pointer [color-scheme:dark] transition duration-200 font-mono"
+                                    >
+                                        <option value="USD" className="bg-brand-midnight text-brand-cream">USD ($)</option>
+                                        <option value="EUR" className="bg-brand-midnight text-brand-cream">EUR (€)</option>
+                                        <option value="GBP" className="bg-brand-midnight text-brand-cream">GBP (£)</option>
+                                        <option value="INR" className="bg-brand-midnight text-brand-cream">INR (₹)</option>
+                                        <option value="JPY" className="bg-brand-midnight text-brand-cream">JPY (¥)</option>
+                                        <option value="CAD" className="bg-brand-midnight text-brand-cream">CAD (C$)</option>
+                                        <option value="AUD" className="bg-brand-midnight text-brand-cream">AUD (A$)</option>
+                                        <option value="CHF" className="bg-brand-midnight text-brand-cream">CHF (Fr.)</option>
+                                        <option value="CNY" className="bg-brand-midnight text-brand-cream">CNY (¥)</option>
+                                    </select>
+                                </div>
+
+                                <Link to="/profile" className="flex items-center gap-3 hover:opacity-80 transition cursor-pointer border-l border-brand-cream/10 pl-4">
                                     <div className="hidden flex-col items-end md:flex">
                                         <span className="text-xs font-semibold text-brand-cream">{user.name}</span>
                                         <span className="text-[10px] text-brand-silver font-mono">{user.email}</span>

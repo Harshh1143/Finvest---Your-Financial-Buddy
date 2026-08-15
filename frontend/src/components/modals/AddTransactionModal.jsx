@@ -4,6 +4,8 @@ import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, DollarSign, Calendar, Tag, FileText } from "lucide-react";
 import { Button } from "../ui/button";
+import { useAuth } from "../providers/auth-provider";
+import { getCurrencySymbol } from "../../lib/currency";
 
 const schema = z.object({
     amount: z.coerce.number().positive("Amount must be a positive number"),
@@ -26,6 +28,7 @@ const POPULAR_CATEGORIES = [
 ];
 
 export function AddTransactionModal({ isOpen, onClose, onSuccess }) {
+    const { user } = useAuth();
     const { register, handleSubmit, formState: { errors, isSubmitting }, reset, } = useForm({
         resolver: zodResolver(schema),
         defaultValues: {
@@ -86,7 +89,7 @@ export function AddTransactionModal({ isOpen, onClose, onSuccess }) {
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-wider text-brand-silver font-bold">Amount</label>
                 <div className="relative">
-                  <DollarSign className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-silver/50"/>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-brand-silver/50 font-mono">{getCurrencySymbol(user)}</span>
                   <input {...register("amount")} type="number" step="0.01" placeholder="0.00" className="w-full rounded-lg border border-brand-cream/10 bg-brand-cream/5 py-3.5 pl-11 pr-4 text-xs text-brand-cream placeholder-brand-silver/30 outline-none transition focus:border-brand-cobalt focus:bg-brand-cream/10 font-mono"/>
                 </div>
                 {errors.amount && (<p className="text-xs text-red-400 font-mono">{errors.amount.message}</p>)}

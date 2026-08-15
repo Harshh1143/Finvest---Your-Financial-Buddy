@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   User, Shield, ShieldAlert, Key, Globe, DollarSign, Euro, PoundSterling, IndianRupee,
-  Bell, Palette, RefreshCw, Trash2, CheckCircle2, AlertTriangle, Eye, EyeOff
+  Bell, Palette, RefreshCw, Trash2, CheckCircle2, AlertTriangle, Eye, EyeOff, Coins
 } from "lucide-react";
 import { useAuth } from "../components/providers/auth-provider";
 import { Button } from "../components/ui/button";
@@ -17,6 +17,11 @@ const CURRENCIES = [
   { code: "EUR", symbol: "€", name: "Euro", icon: Euro },
   { code: "GBP", symbol: "£", name: "British Pound", icon: PoundSterling },
   { code: "INR", symbol: "₹", name: "Indian Rupee", icon: IndianRupee },
+  { code: "JPY", symbol: "¥", name: "Japanese Yen", icon: Coins },
+  { code: "CAD", symbol: "C$", name: "Canadian Dollar", icon: Coins },
+  { code: "AUD", symbol: "A$", name: "Australian Dollar", icon: Coins },
+  { code: "CHF", symbol: "Fr.", name: "Swiss Franc", icon: Coins },
+  { code: "CNY", symbol: "¥", name: "Chinese Yuan", icon: Coins },
 ];
 
 const THEMES = [

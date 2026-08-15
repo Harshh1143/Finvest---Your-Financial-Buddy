@@ -16,7 +16,7 @@ import { useAuth } from "../components/providers/auth-provider";
 import { AddTransactionModal } from "../components/modals/AddTransactionModal";
 import { AddSavingsGoalModal } from "../components/modals/AddSavingsGoalModal";
 import { toast } from "sonner";
-import { formatCurrency, getCurrencySymbol } from "../lib/currency";
+import { formatCurrency, getCurrencySymbol, exchangeRates } from "../lib/currency";
 
 // Curated Royal Cobalt & Silver/Cream Palette for Charts
 const CHART_COLORS = ["#2b5cb8", "#4477d6", "#8c9cb3", "#b3c1d4", "#50627e", "#1b3f80"];
@@ -126,7 +126,15 @@ export function DashboardPage() {
 
   // Mutations
   const addTxMutation = useMutation({
-    mutationFn: (newTx) => db.transactions.add(user.id, newTx),
+    mutationFn: (newTx) => {
+      const userCurrency = user?.settings?.currency || 'USD';
+      const rate = exchangeRates[userCurrency] || 1;
+      const convertedTx = {
+        ...newTx,
+        amount: parseFloat(newTx.amount) / rate
+      };
+      return db.transactions.add(user.id, convertedTx);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions", user?.id] });
       toast.success("Transaction added successfully!");
@@ -137,7 +145,11 @@ export function DashboardPage() {
   });
 
   const setBudgetMutation = useMutation({
-    mutationFn: (amount) => db.budgets.set(user.id, amount),
+    mutationFn: (amount) => {
+      const userCurrency = user?.settings?.currency || 'USD';
+      const rate = exchangeRates[userCurrency] || 1;
+      return db.budgets.set(user.id, amount / rate);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["budget", user?.id] });
       setIsEditingBudget(false);
@@ -150,9 +162,11 @@ export function DashboardPage() {
 
   const addGoalMutation = useMutation({
     mutationFn: (newGoal) => {
+      const userCurrency = user?.settings?.currency || 'USD';
+      const rate = exchangeRates[userCurrency] || 1;
       const payload = {
         name: newGoal.name,
-        targetAmount: parseFloat(newGoal.target_amount),
+        targetAmount: parseFloat(newGoal.target_amount) / rate,
         currentAmount: 0,
         targetDate: newGoal.target_date,
         category: newGoal.category
@@ -169,7 +183,11 @@ export function DashboardPage() {
   });
 
   const addSavingsAmountMutation = useMutation({
-    mutationFn: ({ goalId, amount }) => db.savings.addSavings(user.id, goalId, amount),
+    mutationFn: ({ goalId, amount }) => {
+      const userCurrency = user?.settings?.currency || 'USD';
+      const rate = exchangeRates[userCurrency] || 1;
+      return db.savings.addSavings(user.id, goalId, amount / rate);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["savings", user?.id] });
       toast.success("Deposit processed successfully!");
@@ -727,7 +745,7 @@ export function DashboardPage() {
                     <div className="absolute flex flex-col items-center justify-center text-center">
                       <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-brand-silver">Total Capital</span>
                       <span className="text-xl font-bold tracking-tight text-brand-cream mt-1 font-mono">
-                        ${(portfolioValue + cashBalance + savingsValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {formatCurrency(portfolioValue + cashBalance + savingsValue, user)}
                       </span>
                     </div>
                   </div>
@@ -795,7 +813,7 @@ export function DashboardPage() {
                           </div>
                         </div>
                         <p className={`font-bold text-xs font-mono ${tx.type === "income" ? "text-brand-cobalt-light" : "text-brand-cream"}`}>
-                          {tx.type === "income" ? "+" : "-"}${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {tx.type === "income" ? "+" : "-"}{formatCurrency(tx.amount, user)}
                         </p>
                       </div>
                     );
@@ -880,8 +898,8 @@ export function DashboardPage() {
                           />
                         </div>
                         <div className="flex justify-between text-[10px] font-medium text-brand-silver font-mono">
-                          <span>${goal.currentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} saved</span>
-                          <span>${goal.targetAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} target</span>
+                          <span>{formatCurrency(goal.currentAmount, user)} saved</span>
+                          <span>{formatCurrency(goal.targetAmount, user)} target</span>
                         </div>
                       </div>
 
@@ -889,7 +907,7 @@ export function DashboardPage() {
                       {!isAchieved && (
                         <div className="flex items-center gap-2 pt-1">
                           <div className="relative flex-1">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-brand-silver font-mono">$</span>
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-brand-silver font-mono">{getCurrencySymbol(user)}</span>
                             <input 
                               type="number" 
                               step="0.01" 
