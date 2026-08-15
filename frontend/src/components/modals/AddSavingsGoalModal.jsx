@@ -8,7 +8,14 @@ import { Button } from "../ui/button";
 const schema = z.object({
     name: z.string().min(1, "Please provide a goal name"),
     target_amount: z.coerce.number().positive("Target amount must be a positive number"),
-    target_date: z.string().min(1, "Please select a target date"),
+    target_date: z.string().min(1, "Please select a target date").refine((val) => {
+        const selectedDate = new Date(val);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return selectedDate >= today;
+    }, {
+        message: "Target date cannot be in the past",
+    }),
     category: z.string().min(1, "Please select or type a category"),
 });
 
@@ -80,7 +87,7 @@ export function AddSavingsGoalModal({ isOpen, onClose, onSuccess }) {
                 <label className="text-[10px] uppercase tracking-wider text-brand-silver font-bold">Target Date</label>
                 <div className="relative">
                   <Calendar className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-silver/50"/>
-                  <input {...register("target_date")} type="date" className="w-full rounded-lg border border-brand-cream/10 bg-brand-cream/5 py-3.5 pl-11 pr-4 text-xs text-brand-cream placeholder-brand-silver/30 outline-none transition focus:border-brand-cobalt focus:bg-brand-cream/10 [color-scheme:dark] font-mono"/>
+                  <input {...register("target_date")} type="date" min={new Date().toISOString().split("T")[0]} className="w-full rounded-lg border border-brand-cream/10 bg-brand-cream/5 py-3.5 pl-11 pr-4 text-xs text-brand-cream placeholder-brand-silver/30 outline-none transition focus:border-brand-cobalt focus:bg-brand-cream/10 [color-scheme:dark] font-mono"/>
                 </div>
                 {errors.target_date && (<p className="text-xs text-red-400 font-mono">{errors.target_date.message}</p>)}
               </div>

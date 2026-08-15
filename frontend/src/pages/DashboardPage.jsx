@@ -16,6 +16,7 @@ import { useAuth } from "../components/providers/auth-provider";
 import { AddTransactionModal } from "../components/modals/AddTransactionModal";
 import { AddSavingsGoalModal } from "../components/modals/AddSavingsGoalModal";
 import { toast } from "sonner";
+import { formatCurrency, getCurrencySymbol } from "../lib/currency";
 
 // Curated Royal Cobalt & Silver/Cream Palette for Charts
 const CHART_COLORS = ["#2b5cb8", "#4477d6", "#8c9cb3", "#b3c1d4", "#50627e", "#1b3f80"];
@@ -226,7 +227,7 @@ export function DashboardPage() {
   const summary = [
     {
       title: "Net worth",
-      value: `$${netWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: formatCurrency(netWorth, user),
       change: netWorth === 0 ? "0.0%" : (netWorth > 0 ? "+14.2%" : "-2.5%"),
       detail: "Assets vs Liabilities",
       type: "net-worth",
@@ -235,7 +236,7 @@ export function DashboardPage() {
     },
     {
       title: "Monthly spend",
-      value: `$${monthlyExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: formatCurrency(monthlyExpenses, user),
       change: monthlyExpenses > (budgetData?.monthlyBudget || 5000) ? "+10.4%" : "-4.8%",
       detail: `${currentMonthStr} Expenses`,
       type: "spend",
@@ -244,7 +245,7 @@ export function DashboardPage() {
     },
     {
       title: "Investments",
-      value: `$${portfolioValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: formatCurrency(portfolioValue, user),
       change: "+8.9%",
       detail: `${portfolio.length} active holdings`,
       type: "investments",
@@ -253,7 +254,7 @@ export function DashboardPage() {
     },
     {
       title: "Total Liabilities",
-      value: `$${loansValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: formatCurrency(loansValue, user),
       change: "-1.8%",
       detail: `${loans.length} active debts`,
       type: "liabilities",
@@ -651,39 +652,47 @@ export function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={finalSpendingData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <defs>
-                      {CHART_COLORS.map((color, index) => (
-                        <linearGradient key={`gradient-${index}`} id={`colorBar-${index}`} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor={color} stopOpacity={0.8} />
-                          <stop offset="100%" stopColor={color} stopOpacity={0.15} />
-                        </linearGradient>
-                      ))}
-                    </defs>
-                    <CartesianGrid vertical={false} stroke="rgba(251,250,247,0.03)" />
-                    <XAxis 
-                      dataKey="name" 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fill: "#8c9cb3", fontSize: 10, fontWeight: 500, fontFamily: "var(--font-sans)" }}
-                    />
-                    <YAxis 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fill: "#8c9cb3", fontSize: 10, fontFamily: "var(--font-mono)" }}
-                      tickFormatter={(v) => `$${v}`}
-                    />
-                    <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(251, 250, 247, 0.02)" }} />
-                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                      {finalSpendingData.map((_entry, index) => (
-                        <Cell key={`cell-${index}`} fill={`url(#colorBar-${index % CHART_COLORS.length})`} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              {spendingChartData.length > 0 ? (
+                <div className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={spendingChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <defs>
+                        {CHART_COLORS.map((color, index) => (
+                          <linearGradient key={`gradient-${index}`} id={`colorBar-${index}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={color} stopOpacity={0.8} />
+                            <stop offset="100%" stopColor={color} stopOpacity={0.15} />
+                          </linearGradient>
+                        ))}
+                      </defs>
+                      <CartesianGrid vertical={false} stroke="rgba(251,250,247,0.03)" />
+                      <XAxis 
+                        dataKey="name" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: "#8c9cb3", fontSize: 10, fontWeight: 500, fontFamily: "var(--font-sans)" }}
+                      />
+                      <YAxis 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: "#8c9cb3", fontSize: 10, fontFamily: "var(--font-mono)" }}
+                        tickFormatter={(v) => `$${v}`}
+                      />
+                      <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(251, 250, 247, 0.02)" }} />
+                      <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                        {spendingChartData.map((_entry, index) => (
+                          <Cell key={`cell-${index}`} fill={`url(#colorBar-${index % CHART_COLORS.length})`} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-72 flex flex-col items-center justify-center border border-dashed border-brand-cream/10 rounded-xl px-4 text-center bg-brand-cream/[0.01]">
+                  <Activity className="h-8 w-8 text-brand-silver/40 mb-3 animate-pulse" />
+                  <p className="text-xs text-brand-cream font-bold uppercase tracking-wider font-mono">No spending logged yet</p>
+                  <p className="text-[10px] text-brand-silver/60 mt-1 max-w-xs leading-relaxed">Your outflow category distributions will populate here as you record expenses.</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -694,49 +703,59 @@ export function DashboardPage() {
               <CardDescription className="text-xs text-brand-silver">Total capital distribution</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="h-56 relative flex items-center justify-center">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie 
-                      data={finalAllocations} 
-                      dataKey="value" 
-                      innerRadius={68} 
-                      outerRadius={84} 
-                      paddingAngle={3}
-                    >
-                      {finalAllocations.map((_entry, index) => (
-                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="#091225" strokeWidth={2} />
-                      ))}
-                    </Pie>
-                    <Tooltip content={<CustomPieTooltip />} />
-                  </PieChart>
-                </ResponsiveContainer>
-                
-                {/* Center total info overlay */}
-                <div className="absolute flex flex-col items-center justify-center text-center">
-                  <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-brand-silver">Total Capital</span>
-                  <span className="text-xl font-bold tracking-tight text-brand-cream mt-1 font-mono">
-                    ${(portfolioValue + cashBalance + savingsValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                {finalAllocations.map((item, index) => (
-                  <div 
-                    key={item.name} 
-                    className="flex items-center justify-between rounded-xl border border-brand-cream/5 bg-brand-cream/5 px-3 py-2 text-xs text-brand-silver"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }} />
-                      <span className="font-semibold">{item.name}</span>
+              {allocations.length > 0 ? (
+                <>
+                  <div className="h-56 relative flex items-center justify-center">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie 
+                          data={allocations} 
+                          dataKey="value" 
+                          innerRadius={68} 
+                          outerRadius={84} 
+                          paddingAngle={3}
+                        >
+                          {allocations.map((_entry, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="#091225" strokeWidth={2} />
+                          ))}
+                        </Pie>
+                        <Tooltip content={<CustomPieTooltip />} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    
+                    {/* Center total info overlay */}
+                    <div className="absolute flex flex-col items-center justify-center text-center">
+                      <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-brand-silver">Total Capital</span>
+                      <span className="text-xl font-bold tracking-tight text-brand-cream mt-1 font-mono">
+                        ${(portfolioValue + cashBalance + savingsValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
                     </div>
-                    <span className="font-bold text-brand-cream font-mono">
-                      {item.value}%
-                    </span>
                   </div>
-                ))}
-              </div>
+                  
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    {allocations.map((item, index) => (
+                      <div 
+                        key={item.name} 
+                        className="flex items-center justify-between rounded-xl border border-brand-cream/5 bg-brand-cream/5 px-3 py-2 text-xs text-brand-silver"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }} />
+                          <span className="font-semibold">{item.name}</span>
+                        </div>
+                        <span className="font-bold text-brand-cream font-mono">
+                          {item.value}%
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="h-[280px] flex flex-col items-center justify-center border border-dashed border-brand-cream/10 rounded-xl px-4 text-center bg-brand-cream/[0.01]">
+                  <TrendingUp className="h-8 w-8 text-brand-silver/40 mb-3" />
+                  <p className="text-xs text-brand-cream font-bold uppercase tracking-wider font-mono">No assets allocated yet</p>
+                  <p className="text-[10px] text-brand-silver/60 mt-1 max-w-xs leading-relaxed">Your capital distribution across stocks, cash, bonds, and savings will show up here.</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

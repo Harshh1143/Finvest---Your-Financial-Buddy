@@ -21,12 +21,19 @@ router.post('/', asyncHandler(async (req, res, next) => {
     return next(new AppError('Please provide all required fields: name, targetAmount, targetDate, category', 400));
   }
 
+  const selectedDate = new Date(targetDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (selectedDate < today) {
+    return next(new AppError('Target date cannot be in the past', 400));
+  }
+
   const goal = new SavingsGoal({
     userId: req.userId,
     name,
     targetAmount,
     currentAmount: currentAmount || 0,
-    targetDate: new Date(targetDate),
+    targetDate: selectedDate,
     category
   });
   

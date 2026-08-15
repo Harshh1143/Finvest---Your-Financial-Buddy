@@ -27,7 +27,8 @@ router.post('/register', asyncHandler(async (req, res, next) => {
       id: user._id,
       name: user.name,
       email: user.email,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
+      settings: user.settings
     },
     token
   });
@@ -57,7 +58,8 @@ router.post('/login', asyncHandler(async (req, res, next) => {
       id: user._id,
       name: user.name,
       email: user.email,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
+      settings: user.settings
     },
     token
   });
@@ -72,8 +74,69 @@ router.get('/me', authenticate, asyncHandler(async (req, res, next) => {
     id: req.user._id,
     name: req.user.name,
     email: req.user.email,
-    isAdmin: req.user.isAdmin
+    isAdmin: req.user.isAdmin,
+    settings: req.user.settings
   });
+}));
+
+// Update profile and settings
+router.put('/profile', authenticate, asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.userId);
+  if (!user) {
+    return next(new AppError('User not found', 404));
+  }
+
+  const { name, email, password, settings } = req.body;
+
+  if (name) user.name = name;
+  if (email && email.toLowerCase() !== user.email) {
+    const existing = await User.findOne({ email: email.toLowerCase() });
+    if (existing) {
+      return next(new AppError('Email already in use', 400));
+    }
+    user.email = email.toLowerCase();
+  }
+  if (password) {
+    user.password = password;
+  }
+
+  if (settings) {
+    user.settings = {
+      ...user.settings,
+      ...settings
+    };
+  }
+
+  await user.save();
+
+  res.json({
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      settings: user.settings
+    }
+  });
+}));
+
+// Reset all user data
+router.post('/reset-data', authenticate, asyncHandler(async (req, res, next) => {
+  const userId = req.userId;
+  
+  const Transaction = (await import('../models/Transaction.js')).default;
+  const PortfolioAsset = (await import('../models/PortfolioAsset.js')).default;
+  const Budget = (await import('../models/Budget.js')).default;
+  const Loan = (await import('../models/Loan.js')).default;
+  const SavingsGoal = (await import('../models/SavingsGoal.js')).default;
+
+  await Transaction.deleteMany({ userId });
+  await PortfolioAsset.deleteMany({ userId });
+  await Budget.deleteMany({ userId });
+  await Loan.deleteMany({ userId });
+  await SavingsGoal.deleteMany({ userId });
+
+  res.json({ message: 'All financial data has been reset successfully.' });
 }));
 
 export default router;

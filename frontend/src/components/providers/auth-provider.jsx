@@ -65,7 +65,19 @@ export function AuthProvider({ children }) {
             setLoading(false);
         }
     };
-    return (<AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    const updateProfile = async (profileData) => {
+        try {
+            const res = await db.auth.updateProfile(profileData);
+            if (res.user) {
+                setUser(res.user);
+            }
+            return res;
+        }
+        catch (err) {
+            return { user: null, error: err?.message || "Failed to update profile" };
+        }
+    };
+    return (<AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateProfile }}>
       {children}
     </AuthContext.Provider>);
 }

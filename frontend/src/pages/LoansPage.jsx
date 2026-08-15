@@ -13,24 +13,25 @@ import { db } from "../lib/db";
 import { useAuth } from "../components/providers/auth-provider";
 import { AddLoanModal } from "../components/modals/AddLoanModal";
 import { toast } from "sonner";
-
-// Premium Custom Tooltip for the Debt Chart
-const CustomTooltip = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="rounded-xl border border-brand-cream/10 bg-brand-midnight-card px-4 py-3 shadow-2xl">
-        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-brand-silver font-mono">{label}</p>
-        <p className="mt-1.5 text-sm font-bold text-brand-cream font-mono">
-          Projected: ${Number(payload[0].value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-      </div>
-    );
-  }
-  return null;
-};
+import { formatCurrency, getCurrencySymbol } from "../lib/currency";
 
 export function LoansPage() {
     const { user } = useAuth();
+    
+    // Premium Custom Tooltip for the Debt Chart
+    const CustomTooltip = ({ active, payload, label }) => {
+      if (active && payload && payload.length) {
+        return (
+          <div className="rounded-xl border border-brand-cream/10 bg-brand-midnight-card px-4 py-3 shadow-2xl">
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-brand-silver font-mono">{label}</p>
+            <p className="mt-1.5 text-sm font-bold text-brand-cream font-mono">
+              Projected: {formatCurrency(payload[0].value, user)}
+            </p>
+          </div>
+        );
+      }
+      return null;
+    };
     const queryClient = useQueryClient();
     const [isAddLoanOpen, setIsAddLoanOpen] = useState(false);
     const [payingLoanId, setPayingLoanId] = useState(null);
@@ -199,28 +200,28 @@ export function LoansPage() {
                         {[
                             {
                                 label: "Total outstanding balance",
-                                value: `$${totalRemaining.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                                value: formatCurrency(totalRemaining, user),
                                 color: "text-brand-cream",
                                 icon: Landmark,
                                 iconColor: "text-brand-silver bg-brand-cream/5 border-brand-cream/10",
                             },
                             {
                                 label: "Original principal",
-                                value: `$${totalPrincipal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                                value: formatCurrency(totalPrincipal, user),
                                 color: "text-brand-silver",
                                 icon: Coins,
                                 iconColor: "text-brand-silver bg-brand-cream/5 border-brand-cream/10",
                             },
                             {
                                 label: "Total amount repaid",
-                                value: `$${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                                value: formatCurrency(totalPaid, user),
                                 color: "text-emerald-400",
                                 icon: TrendingUp,
                                 iconColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
                             },
                             {
                                 label: "Monthly EMI commitment",
-                                value: `$${totalMonthlyEMI.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                                value: formatCurrency(totalMonthlyEMI, user),
                                 color: "text-brand-cobalt-light",
                                 icon: ReceiptText,
                                 iconColor: "text-brand-cobalt-light bg-brand-cobalt/10 border-brand-cobalt/20",
@@ -305,13 +306,13 @@ export function LoansPage() {
                                                     <div>
                                                         <p className="text-[10px] font-bold text-brand-silver uppercase tracking-wider font-mono">Remaining Balance</p>
                                                         <p className="mt-1 text-xl font-bold text-brand-cream font-mono">
-                                                            ${loan.remaining.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                            {formatCurrency(loan.remaining, user)}
                                                         </p>
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="text-[10px] font-bold text-brand-silver uppercase tracking-wider font-mono">Monthly EMI</p>
                                                         <p className="mt-1 text-base font-bold text-brand-cobalt-light font-mono">
-                                                            ${loan.monthlyEMI.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                            {formatCurrency(loan.monthlyEMI, user)}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -339,7 +340,7 @@ export function LoansPage() {
                                                             Original Principal
                                                         </p>
                                                         <p className="mt-1 font-bold text-brand-cream text-xs font-mono">
-                                                            ${loan.principal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                            {formatCurrency(loan.principal, user)}
                                                         </p>
                                                     </div>
                                                     <div className="rounded-xl border border-brand-cream/10 bg-brand-cream/5 p-3">
@@ -347,7 +348,7 @@ export function LoansPage() {
                                                             Interest Paid
                                                         </p>
                                                         <p className="mt-1 font-bold text-brand-cream text-xs font-mono">
-                                                            ${loan.interestPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                            {formatCurrency(loan.interestPaid, user)}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -459,12 +460,11 @@ export function LoansPage() {
                                                     axisLine={false} 
                                                     tickLine={false} 
                                                     tick={{ fill: "#8c9cb3", fontSize: 10, fontWeight: 500 }}
-                                                />
-                                                <YAxis 
+                                                />                                                <YAxis 
                                                     axisLine={false} 
                                                     tickLine={false} 
                                                     tick={{ fill: "#8c9cb3", fontSize: 10, fontWeight: 500, fontFamily: "var(--font-mono)" }}
-                                                    tickFormatter={(v) => `$${v}`}
+                                                    tickFormatter={(v) => `${getCurrencySymbol(user)}${v.toLocaleString()}`}
                                                 />
                                                 <Tooltip content={<CustomTooltip />} />
                                                 <Bar 
@@ -477,7 +477,7 @@ export function LoansPage() {
                                     </div>
                                 </CardContent>
                             </Card>
-
+ 
                             {/* Repayment Health Details */}
                             <Card className="border-brand-cream/5 bg-brand-midnight-card/75 rounded-2xl border overflow-hidden relative flex flex-col justify-between">
                                 <CardHeader className="pb-4">
@@ -491,12 +491,12 @@ export function LoansPage() {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     {[
-                                        ["Total principal", `$${totalPrincipal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
-                                        ["Total remaining", `$${totalRemaining.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
-                                        ["Total paid off", `$${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
-                                        ["Total interest paid", `$${totalInterestPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
+                                        ["Total principal", formatCurrency(totalPrincipal, user)],
+                                        ["Total remaining", formatCurrency(totalRemaining, user)],
+                                        ["Total paid off", formatCurrency(totalPaid, user)],
+                                        ["Total interest paid", formatCurrency(totalInterestPaid, user)],
                                         ["Next payment due", formatNextDue(nextDueDate)],
-                                    ].map(([label, value]) => (
+                                    ].map(([label, value]) => ((
                                         <div key={label} className="flex items-center justify-between rounded-xl border border-brand-cream/5 bg-brand-cream/5 px-4.5 py-3.5 hover:border-brand-cobalt/20 transition-all duration-200">
                                             <span className="text-xs font-semibold text-brand-silver">{label}</span>
                                             <span className="font-bold text-brand-cream text-xs font-mono">{value}</span>

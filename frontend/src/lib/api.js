@@ -1,28 +1,43 @@
+import axios from 'axios';
+
 // API client for the Express/MongoDB backend
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const getToken = () => localStorage.getItem('finvest_token');
 
-const request = async (endpoint, options = {}) => {
-  const token = getToken();
-  const config = {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
-    },
-  };
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
-  const response = await fetch(`${API_URL}${endpoint}`, config);
-  
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'Request failed' }));
-    throw new Error(error.error || 'Request failed');
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-  
-  return response.json();
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
+const request = async (endpoint, options = {}) => {
+  const { method = 'GET', body, headers = {} } = options;
+  try {
+    const response = await api({
+      url: endpoint,
+      method,
+      data: body ? (typeof body === 'string' ? JSON.parse(body) : body) : undefined,
+      headers,
+    });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.error || error.message || 'Request failed';
+    throw new Error(errorMessage);
+  }
 };
+
 
 // Auth API
 export const authApi = {
@@ -33,6 +48,12 @@ export const authApi = {
     request('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password }) }),
   
   me: () => request('/auth/me'),
+
+  updateProfile: (profileData) => 
+    request('/auth/profile', { method: 'PUT', body: JSON.stringify(profileData) }),
+
+  resetData: () => 
+    request('/auth/reset-data', { method: 'POST' }),
 };
 
 // Transactions API

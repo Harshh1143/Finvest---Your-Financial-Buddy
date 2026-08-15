@@ -5,7 +5,12 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true },
-  isAdmin: { type: Boolean, default: false }
+  isAdmin: { type: Boolean, default: false },
+  settings: {
+    currency: { type: String, default: 'USD' },
+    alertThreshold: { type: Number, default: 80 },
+    theme: { type: String, default: 'cobalt' }
+  }
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {

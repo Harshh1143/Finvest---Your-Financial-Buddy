@@ -12,6 +12,7 @@ import { Shell } from "../components/layout/shell";
 import { db } from "../lib/db";
 import { useAuth } from "../components/providers/auth-provider";
 import { toast } from "sonner";
+import { formatCurrency, getCurrencySymbol } from "../lib/currency";
 
 const DEFAULT_ASSETS_INFO = {
   AAPL: { name: "Apple Inc.", price: 214.83, change: "+1.84%", type: "Stocks" },
@@ -35,23 +36,23 @@ const ASSET_TYPES = [
   "Other",
 ];
 
-// Premium Custom Tooltip for Portfolio
-const CustomTooltip = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="rounded-xl border border-brand-cream/10 bg-brand-midnight-card px-4 py-3 shadow-2xl">
-        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-brand-silver font-mono">{label}</p>
-        <p className="mt-1.5 text-sm font-bold text-brand-cream font-mono">
-          ${Number(payload[0].value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-      </div>
-    );
-  }
-  return null;
-};
-
 export function PortfolioPage() {
   const { user } = useAuth();
+
+  // Premium Custom Tooltip for Portfolio
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="rounded-xl border border-brand-cream/10 bg-brand-midnight-card px-4 py-3 shadow-2xl">
+          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-brand-silver font-mono">{label}</p>
+          <p className="mt-1.5 text-sm font-bold text-brand-cream font-mono">
+            {formatCurrency(payload[0].value, user)}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTicker, setSelectedTicker] = useState("AAPL");
@@ -301,7 +302,7 @@ export function PortfolioPage() {
                         <p className="text-[10px] text-brand-silver mt-1">{asset.name}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-xs text-brand-cream font-mono">${asset.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        <p className="font-bold text-xs text-brand-cream font-mono">{formatCurrency(asset.price, user)}</p>
                         <span className="inline-flex items-center gap-0.5 text-[10px] font-mono font-bold text-emerald-400 mt-1">
                           <ArrowUpRight className="h-3 w-3 stroke-[2.5]" />
                           {asset.change}
@@ -472,21 +473,21 @@ export function PortfolioPage() {
               {[
                 {
                   label: "Portfolio value",
-                  value: `$${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                  value: formatCurrency(totalValue, user),
                   color: "text-brand-cream",
                   icon: TrendingUp,
                   iconColor: "text-brand-silver bg-brand-cobalt/10 border-brand-cobalt/20",
                 },
                 {
                   label: "Total cost basis",
-                  value: `$${totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                  value: formatCurrency(totalCost, user),
                   color: "text-brand-silver",
                   icon: Briefcase,
                   iconColor: "text-brand-silver bg-brand-cream/5 border-brand-cream/10",
                 },
                 {
                   label: "Unrealized gain / loss",
-                  value: `${totalPL >= 0 ? "+" : ""}$${totalPL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                  value: `${totalPL >= 0 ? "+" : ""}${formatCurrency(Math.abs(totalPL), user)}`,
                   color: totalPL >= 0 ? "text-emerald-400" : "text-rose-400",
                   icon: PiggyBank,
                   iconColor: totalPL >= 0 ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" : "text-rose-400 bg-rose-500/10 border-rose-500/20",
@@ -555,7 +556,7 @@ export function PortfolioPage() {
                         axisLine={false} 
                         tickLine={false} 
                         tick={{ fill: "#8c9cb3", fontSize: 10, fontWeight: 500, fontFamily: "var(--font-mono)" }}
-                        tickFormatter={(v) => `$${v}`}
+                        tickFormatter={(v) => `${getCurrencySymbol(user)}${v.toLocaleString()}`}
                       />
                       <Tooltip content={<CustomTooltip />} />
                       <Area 
@@ -619,7 +620,7 @@ export function PortfolioPage() {
                             {asset.quantity.toLocaleString(undefined, { maximumFractionDigits: 5 })}
                           </td>
                           <td className="py-5 px-4 text-right font-medium text-brand-silver font-mono">
-                            ${asset.purchasePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {formatCurrency(asset.purchasePrice, user)}
                           </td>
                           <td className="py-5 px-4 text-right">
                             {isEditing ? (
@@ -650,7 +651,7 @@ export function PortfolioPage() {
                               </div>
                             ) : (
                               <div className="flex items-center justify-end gap-2 font-bold text-brand-cobalt-light font-mono">
-                                <span>${asset.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <span>{formatCurrency(asset.currentPrice, user)}</span>
                                 <button 
                                   onClick={() => {
                                     setEditingAssetId(asset._id);
@@ -664,10 +665,10 @@ export function PortfolioPage() {
                             )}
                           </td>
                           <td className="py-5 px-4 text-right font-medium text-brand-silver font-mono">
-                            ${asset.totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {formatCurrency(asset.totalCost, user)}
                           </td>
                           <td className="py-5 px-4 text-right font-bold text-brand-cream font-mono">
-                            ${asset.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {formatCurrency(asset.totalValue, user)}
                           </td>
                           <td className={`py-5 px-4 text-right font-bold font-mono ${isLoss ? "text-rose-400" : "text-emerald-400"}`}>
                             <div className="flex items-center justify-end gap-1">
@@ -677,7 +678,7 @@ export function PortfolioPage() {
                               </span>
                             </div>
                             <span className="text-[10px] font-medium block mt-0.5 opacity-80">
-                              {isLoss ? "-" : "+"}${Math.abs(asset.unrealizedPL).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              {isLoss ? "-" : "+"}{formatCurrency(Math.abs(asset.unrealizedPL), user)}
                             </span>
                           </td>
                           <td className="py-5 px-6 text-center">

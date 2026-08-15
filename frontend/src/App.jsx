@@ -3,6 +3,7 @@ import { HomePage } from "./pages/HomePage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { PortfolioPage } from "./pages/PortfolioPage";
 import { LoansPage } from "./pages/LoansPage";
+import { ProfilePage } from "./pages/ProfilePage";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { Toaster } from "sonner";
 function App() {
@@ -19,6 +20,9 @@ function App() {
               </ProtectedRoute>}/>
           <Route path="/loans" element={<ProtectedRoute>
                 <LoansPage />
+              </ProtectedRoute>}/>
+          <Route path="/profile" element={<ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>}/>
         </Routes>
       </BrowserRouter>

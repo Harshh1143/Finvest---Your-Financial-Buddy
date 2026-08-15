@@ -6,12 +6,13 @@ import { Link, useLocation } from "react-router-dom";
 export function Shell({ children }) {
     const { user, signOut } = useAuth();
     const location = useLocation();
-    const isAppView = ["/dashboard", "/portfolio", "/loans"].includes(location.pathname);
+    const isAppView = ["/dashboard", "/portfolio", "/loans", "/profile"].includes(location.pathname);
     const navItems = isAppView
         ? [
             { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
             { label: "Portfolio", href: "/portfolio", icon: Briefcase },
             { label: "Loans", href: "/loans", icon: Percent },
+            { label: "Profile", href: "/profile", icon: User },
         ]
         : [
             { label: "Features", href: "#product" },
@@ -61,13 +62,15 @@ export function Shell({ children }) {
                     {isAppView ? (
                         user && (
                             <div className="flex items-center gap-3">
-                                <div className="hidden flex-col items-end md:flex">
-                                    <span className="text-xs font-semibold text-brand-cream">{user.name}</span>
-                                    <span className="text-[10px] text-brand-silver font-mono">{user.email}</span>
-                                </div>
-                                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-brand-cream/10 bg-brand-cream/5">
-                                    <User className="h-4 w-4 text-brand-cobalt-light"/>
-                                </div>
+                                <Link to="/profile" className="flex items-center gap-3 hover:opacity-80 transition cursor-pointer">
+                                    <div className="hidden flex-col items-end md:flex">
+                                        <span className="text-xs font-semibold text-brand-cream">{user.name}</span>
+                                        <span className="text-[10px] text-brand-silver font-mono">{user.email}</span>
+                                    </div>
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-brand-cream/10 bg-brand-cream/5">
+                                        <User className="h-4 w-4 text-brand-cobalt-light"/>
+                                    </div>
+                                </Link>
                                 <Button 
                                     variant="ghost" 
                                     size="icon" 
