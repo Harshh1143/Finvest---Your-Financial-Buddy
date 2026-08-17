@@ -1,29 +1,60 @@
 @import "tailwindcss";
 
-@theme {
+@theme inline {
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", monospace;
   
-  --color-brand-midnight: #050b1a;
-  --color-brand-midnight-card: #091225;
-  --color-brand-midnight-card-hover: #0d1a33;
-  --color-brand-cobalt: #2b5cb8;
-  --color-brand-cobalt-light: #4477d6;
-  --color-brand-cobalt-dark: #1b3f80;
-  --color-brand-cream: #fbfaf7;
-  --color-brand-silver: #8c9cb3;
+  --color-brand-midnight: var(--brand-midnight);
+  --color-brand-midnight-card: var(--brand-midnight-card);
+  --color-brand-midnight-card-hover: var(--brand-midnight-card-hover);
+  --color-brand-cobalt: var(--brand-cobalt);
+  --color-brand-cobalt-light: var(--brand-cobalt-light);
+  --color-brand-cobalt-dark: var(--brand-cobalt-dark);
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-silver: var(--brand-silver);
 }
 
+/* ── Default theme (Royal Cobalt) ── */
 :root {
+  --brand-midnight: #050b1a;
+  --brand-midnight-card: #091225;
+  --brand-midnight-card-hover: #0d1a33;
+  --brand-cobalt: #2b5cb8;
+  --brand-cobalt-light: #4477d6;
+  --brand-cobalt-dark: #1b3f80;
+  --brand-cream: #fbfaf7;
+  --brand-silver: #8c9cb3;
+
   font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
-  color: var(--color-brand-cream);
-  background-color: var(--color-brand-midnight);
+  color: var(--brand-cream);
+  background-color: var(--brand-midnight);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Emerald theme ── */
+[data-theme="emerald"] {
+  --brand-cobalt: #059669;
+  --brand-cobalt-light: #10b981;
+  --brand-cobalt-dark: #047857;
+}
+
+/* ── Crimson theme ── */
+[data-theme="crimson"] {
+  --brand-cobalt: #dc2626;
+  --brand-cobalt-light: #ef4444;
+  --brand-cobalt-dark: #b91c1c;
+}
+
+/* ── Amber theme ── */
+[data-theme="amber"] {
+  --brand-cobalt: #d97706;
+  --brand-cobalt-light: #f59e0b;
+  --brand-cobalt-dark: #b45309;
 }
 
 * {

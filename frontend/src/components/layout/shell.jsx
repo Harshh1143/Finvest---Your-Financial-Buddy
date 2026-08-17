@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Landmark, ShieldCheck, Sparkles, LogOut, User, LayoutDashboard, Briefcase, Percent, Globe, Menu, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { useAuth } from "../providers/auth-provider";
@@ -10,6 +10,13 @@ export function Shell({ children }) {
     const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const isAppView = ["/dashboard", "/portfolio", "/loans", "/profile"].includes(location.pathname);
+
+    // Apply accent theme to <html> whenever the user's saved theme changes
+    useEffect(() => {
+        const theme = user?.settings?.theme || "cobalt";
+        document.documentElement.setAttribute("data-theme", theme === "cobalt" ? "" : theme);
+    }, [user?.settings?.theme]);
+
     const navItems = isAppView
         ? [
             { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },

@@ -376,6 +376,8 @@ export function ProfilePage() {
                               key={t.id}
                               onClick={() => {
                                 setTheme(t.id);
+                                // Apply instantly (optimistic) — Shell's useEffect will keep it in sync
+                                document.documentElement.setAttribute("data-theme", t.id === "cobalt" ? "" : t.id);
                                 handleUpdateSettings(undefined, undefined, t.id);
                               }}
                               className={`flex items-center justify-between p-4.5 rounded-xl border transition cursor-pointer ${
