@@ -1,7 +1,18 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'finvest-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('💥 FATAL CONFIGURATION ERROR: JWT_SECRET environment variable must be set in production!');
+    process.exit(1);
+  } else {
+    console.warn('⚠️ WARNING: JWT_SECRET environment variable is not defined. Using local development fallback.');
+  }
+}
+
+const activeSecret = JWT_SECRET || 'finvest-secret-key-change-in-production';
 
 export const authenticate = async (req, res, next) => {
   try {
@@ -11,7 +22,7 @@ export const authenticate = async (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, activeSecret);
     
     const user = await User.findById(decoded.userId).select('-password');
     if (!user) {
@@ -27,5 +38,5 @@ export const authenticate = async (req, res, next) => {
 };
 
 export const generateToken = (userId) => {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign({ userId }, activeSecret, { expiresIn: '7d' });
 };
