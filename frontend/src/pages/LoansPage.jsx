@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, lazy, Suspense } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -11,9 +11,10 @@ import { Button } from "../components/ui/button";
 import { Shell } from "../components/layout/shell";
 import { db } from "../lib/db";
 import { useAuth } from "../components/providers/auth-provider";
-import { AddLoanModal } from "../components/modals/AddLoanModal";
 import { toast } from "sonner";
 import { formatCurrency, getCurrencySymbol, exchangeRates } from "../lib/currency";
+
+const AddLoanModal = lazy(() => import("../components/modals/AddLoanModal").then(m => ({ default: m.AddLoanModal })));
 
 export function LoansPage() {
     const { user } = useAuth();
@@ -152,10 +153,10 @@ export function LoansPage() {
         return result;
     }, [loans]);
 
-    const handlePayEMI = async (loanId) => {
+    const handlePayEMI = useCallback(async (loanId) => {
         const extra = parseFloat(extraPayment) || 0;
         await payEMIMutation.mutateAsync({ loanId, extraPayment: extra });
-    };
+    }, [extraPayment, payEMIMutation]);
 
     if (isLoading) {
         return (
@@ -527,13 +528,15 @@ export function LoansPage() {
                 )}
             </div>
 
-            <AddLoanModal 
-                isOpen={isAddLoanOpen} 
-                onClose={() => setIsAddLoanOpen(false)} 
-                onSuccess={async (data) => {
-                    await addLoanMutation.mutateAsync(data);
-                }}
-            />
+            <Suspense fallback={null}>
+                <AddLoanModal 
+                    isOpen={isAddLoanOpen} 
+                    onClose={useCallback(() => setIsAddLoanOpen(false), [])} 
+                    onSuccess={useCallback(async (data) => {
+                        await addLoanMutation.mutateAsync(data);
+                    }, [addLoanMutation])}
+                />
+            </Suspense>
         </Shell>
     );
 }

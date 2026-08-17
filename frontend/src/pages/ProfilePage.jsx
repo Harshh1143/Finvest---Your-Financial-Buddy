@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   User, Shield, ShieldAlert, Key, Globe, DollarSign, Euro, PoundSterling, IndianRupee,
@@ -54,7 +54,7 @@ export function ProfilePage() {
   const [confirmResetText, setConfirmResetText] = useState("");
   const [isResettingData, setIsResettingData] = useState(false);
 
-  const handleUpdateProfile = async (e) => {
+  const handleUpdateProfile = useCallback(async (e) => {
     e.preventDefault();
     if (password && password !== confirmPassword) {
       toast.error("Passwords do not match");
@@ -80,9 +80,9 @@ export function ProfilePage() {
     } finally {
       setIsUpdatingProfile(false);
     }
-  };
+  }, [name, email, password, confirmPassword, updateProfile]);
 
-  const handleUpdateSettings = async (selectedCurrency, selectedThreshold, selectedTheme) => {
+  const handleUpdateSettings = useCallback(async (selectedCurrency, selectedThreshold, selectedTheme) => {
     setIsUpdatingSettings(true);
     try {
       const payload = {
@@ -103,9 +103,9 @@ export function ProfilePage() {
     } finally {
       setIsUpdatingSettings(false);
     }
-  };
+  }, [currency, alertThreshold, theme, updateProfile]);
 
-  const handleResetData = async () => {
+  const handleResetData = useCallback(async () => {
     if (confirmResetText.toLowerCase() !== "reset") {
       toast.error("Please type 'reset' to confirm data purge");
       return;
@@ -125,7 +125,7 @@ export function ProfilePage() {
     } finally {
       setIsResettingData(false);
     }
-  };
+  }, [confirmResetText, queryClient]);
 
   return (
     <Shell>

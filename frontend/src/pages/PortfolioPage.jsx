@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { 
@@ -220,7 +220,7 @@ export function PortfolioPage() {
   }, [totalValue]);
 
   // Handlers
-  const handleAddAsset = async (e) => {
+  const handleAddAsset = useCallback(async (e) => {
     e.preventDefault();
     if (!user?.id) return;
     const userCurrency = user?.settings?.currency || 'USD';
@@ -239,9 +239,9 @@ export function PortfolioPage() {
       purchaseDate: purchaseDate,
     };
     await addAssetMutation.mutateAsync(payload);
-  };
+  }, [user, purchasePrice, selectedTicker, assetsCatalog, currentAssetInfo, quantity, purchaseDate, addAssetMutation]);
 
-  const handleUpdatePrice = async (assetId) => {
+  const handleUpdatePrice = useCallback(async (assetId) => {
     const userCurrency = user?.settings?.currency || 'USD';
     const rate = exchangeRates[userCurrency] || 1;
     const price = parseFloat(editingPrice) / rate;
@@ -250,9 +250,9 @@ export function PortfolioPage() {
     } else {
       toast.error("Please enter a valid price.");
     }
-  };
+  }, [user, editingPrice, updatePriceMutation]);
 
-  const handleAutoRefresh = async () => {
+  const handleAutoRefresh = useCallback(async () => {
     if (!user?.id || portfolio.length === 0) return;
     try {
       const updates = portfolio.map((asset) => {
@@ -267,7 +267,7 @@ export function PortfolioPage() {
       console.error("Failed to auto-refresh prices:", err);
       toast.error("Failed to synchronize market prices.");
     }
-  };
+  }, [user, portfolio, queryClient]);
 
   if (isLoading) {
     return (

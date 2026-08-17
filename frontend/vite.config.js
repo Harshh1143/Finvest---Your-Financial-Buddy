@@ -8,4 +8,30 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('recharts')) {
+              return 'vendor-recharts';
+            }
+            if (id.includes('framer-motion')) {
+              return 'vendor-framer';
+            }
+            if (id.includes('lucide-react')) {
+              return 'vendor-lucide';
+            }
+            if (id.includes('react-hook-form') || id.includes('zod') || id.includes('@hookform/resolvers')) {
+              return 'vendor-forms';
+            }
+            if (id.includes('@tanstack') || id.includes('axios')) {
+              return 'vendor-query-api';
+            }
+            return 'vendor'; // all other third party dependencies
+          }
+        }
+      }
+    }
+  }
 })

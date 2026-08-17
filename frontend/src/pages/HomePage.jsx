@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
@@ -272,17 +272,27 @@ export function HomePage() {
   const [loanTenure, setLoanTenure] = useState(15); // years
 
   // Calculate EMI values
-  const P = loanAmount;
-  const r = loanRate / 12 / 100;
-  const n = loanTenure * 12;
-  const emi = r > 0 ? (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1) : P / n;
-  const totalRepayment = emi * n;
-  const totalInterest = Math.max(0, totalRepayment - P);
+  const { P, r, n, emi, totalRepayment, totalInterest } = useMemo(() => {
+    const P_val = loanAmount;
+    const r_val = loanRate / 12 / 100;
+    const n_val = loanTenure * 12;
+    const emi_val = r_val > 0 ? (P_val * r_val * Math.pow(1 + r_val, n_val)) / (Math.pow(1 + r_val, n_val) - 1) : P_val / n_val;
+    const totalRepayment_val = emi_val * n_val;
+    const totalInterest_val = Math.max(0, totalRepayment_val - P_val);
+    return {
+      P: P_val,
+      r: r_val,
+      n: n_val,
+      emi: emi_val,
+      totalRepayment: totalRepayment_val,
+      totalInterest: totalInterest_val,
+    };
+  }, [loanAmount, loanRate, loanTenure]);
 
-  const emiPieData = [
+  const emiPieData = useMemo(() => [
     { name: "Principal", value: Math.round(P), color: "#2b5cb8" },
     { name: "Interest", value: Math.round(totalInterest), color: "#8c9cb3" },
-  ];
+  ], [P, totalInterest]);
 
   // 2. Compound Interest Projections States
   const [monthlySavings, setMonthlySavings] = useState(1200);
@@ -290,32 +300,39 @@ export function HomePage() {
   const [periodYears, setPeriodYears] = useState(20);
 
   // Generate Growth data for Recharts
-  const growthData = [];
-  let totalContributions = 0;
-  let balance = 0;
-  const monthlyRate = returnRate / 12 / 100;
-  const totalMonths = periodYears * 12;
+  const { growthData, totalContributions, balance } = useMemo(() => {
+    const data = [];
+    let totalContributions_val = 0;
+    let balance_val = 0;
+    const monthlyRate = returnRate / 12 / 100;
+    const totalMonths = periodYears * 12;
 
-  for (let m = 1; m <= totalMonths; m++) {
-    totalContributions += monthlySavings;
-    balance = (balance + monthlySavings) * (1 + monthlyRate);
-    if (m % 12 === 0 || m === totalMonths) {
-      const year = m / 12;
-      growthData.push({
-        name: `Yr ${Math.round(year)}`,
-        Contributions: Math.round(totalContributions),
-        Interest: Math.round(Math.max(0, balance - totalContributions)),
-        Total: Math.round(balance),
-      });
+    for (let m = 1; m <= totalMonths; m++) {
+      totalContributions_val += monthlySavings;
+      balance_val = (balance_val + monthlySavings) * (1 + monthlyRate);
+      if (m % 12 === 0 || m === totalMonths) {
+        const year = m / 12;
+        data.push({
+          name: `Yr ${Math.round(year)}`,
+          Contributions: Math.round(totalContributions_val),
+          Interest: Math.round(Math.max(0, balance_val - totalContributions_val)),
+          Total: Math.round(balance_val),
+        });
+      }
     }
-  }
+    return {
+      growthData: data,
+      totalContributions: totalContributions_val,
+      balance: balance_val,
+    };
+  }, [monthlySavings, returnRate, periodYears]);
 
   // 3. AI Insights States
   const [selectedPrompt, setSelectedPrompt] = useState(null);
   const [aiTyping, setAiTyping] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
-  const aiPrompts = [
+  const aiPrompts = useMemo(() => [
     {
       id: "debt",
       label: "Optimize Debt Repayment Strategy",
@@ -331,9 +348,9 @@ export function HomePage() {
       label: "Verify Real Estate Purchase Feasibility",
       response: "Target purchase of $650,000 with 20% down ($130,000) leaves post-purchase liquidity reserves at 8.4 months of living expenses. Cash reserves adequately support the monthly mortgage flow of $3,420 at current benchmarks. Purchase model is sustainable.",
     },
-  ];
+  ], []);
 
-  const handlePromptSelect = (prompt) => {
+  const handlePromptSelect = useCallback((prompt) => {
     setSelectedPrompt(prompt.id);
     setIsTyping(true);
     setAiTyping("");
@@ -347,17 +364,17 @@ export function HomePage() {
         setIsTyping(false);
       }
     }, 10);
-  };
+  }, []);
 
 
 
   // --- STATE FOR FAQ SECTION ---
   const [openFaq, setOpenFaq] = useState(null);
-  const toggleFaq = (index) => {
-    setOpenFaq(openFaq === index ? null : index);
-  };
+  const toggleFaq = useCallback((index) => {
+    setOpenFaq(prev => prev === index ? null : index);
+  }, []);
 
-  const faqs = [
+  const faqs = useMemo(() => [
     {
       question: "How does Finvest sync with my bank accounts?",
       answer: "We utilize Plaid for secure, read-only authentication with over 11,000 financial institutions. Finvest never stores or has access to your login credentials or active funds.",
@@ -374,10 +391,10 @@ export function HomePage() {
       question: "Does the AI assistant provide registered financial advice?",
       answer: "No, the AI Insights engine offers analytical modeling and projection tools based on mathematical simulations and historical data. It does not replace professional tax or advisory services.",
     },
-  ];
+  ], []);
 
   // Custom tooltips to match Cobalt/Cream theme
-  const CustomRechartsTooltip = ({ active, payload, label }) => {
+  const CustomRechartsTooltip = useCallback(({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
         <div className="rounded-xl border border-brand-cream/10 bg-brand-midnight-card px-3 py-2 text-xs font-mono shadow-2xl">
@@ -391,7 +408,7 @@ export function HomePage() {
       );
     }
     return null;
-  };
+  }, []);
 
   return (
     <div ref={containerRef} className="bg-brand-midnight min-h-screen relative overflow-hidden font-sans text-brand-cream selection:bg-brand-cobalt/40">

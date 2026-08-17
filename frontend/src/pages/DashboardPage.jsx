@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { 
@@ -13,10 +13,12 @@ import { Button } from "../components/ui/button";
 import { Shell } from "../components/layout/shell";
 import { db } from "../lib/db";
 import { useAuth } from "../components/providers/auth-provider";
-import { AddTransactionModal } from "../components/modals/AddTransactionModal";
-import { AddSavingsGoalModal } from "../components/modals/AddSavingsGoalModal";
 import { toast } from "sonner";
 import { formatCurrency, getCurrencySymbol, exchangeRates } from "../lib/currency";
+
+// Lazy loaded modals
+const AddTransactionModal = lazy(() => import("../components/modals/AddTransactionModal").then(m => ({ default: m.AddTransactionModal })));
+const AddSavingsGoalModal = lazy(() => import("../components/modals/AddSavingsGoalModal").then(m => ({ default: m.AddSavingsGoalModal })));
 
 // Curated Royal Cobalt & Silver/Cream Palette for Charts
 const CHART_COLORS = ["#2b5cb8", "#4477d6", "#8c9cb3", "#b3c1d4", "#50627e", "#1b3f80"];
@@ -86,12 +88,12 @@ export function DashboardPage() {
     }
   }, [user?.id]);
 
-  const handleDismissOnboarding = () => {
+  const handleDismissOnboarding = useCallback(() => {
     if (user?.id) {
       localStorage.setItem(`finvest_onboarding_dismissed_${user.id}`, "true");
     }
     setIsOnboardingDismissed(true);
-  };
+  }, [user?.id]);
 
   // Queries
   const { data: transactions = [], isLoading: isTxLoading } = useQuery({
@@ -225,24 +227,24 @@ export function DashboardPage() {
   }
 
   // Calculations
-  const portfolioValue = portfolio.reduce((sum, item) => sum + item.totalValue, 0);
-  const savingsValue = savings.reduce((sum, item) => sum + item.currentAmount, 0);
-  const loansValue = loans.reduce((sum, item) => sum + item.remaining, 0);
+  const portfolioValue = useMemo(() => portfolio.reduce((sum, item) => sum + item.totalValue, 0), [portfolio]);
+  const savingsValue = useMemo(() => savings.reduce((sum, item) => sum + item.currentAmount, 0), [savings]);
+  const loansValue = useMemo(() => loans.reduce((sum, item) => sum + item.remaining, 0), [loans]);
 
   // Cash Balance: income - expenses
-  const netCashFlow = transactions.reduce((sum, t) => {
+  const netCashFlow = useMemo(() => transactions.reduce((sum, t) => {
     return t.type === "income" ? sum + t.amount : sum - t.amount;
-  }, 0);
-  const cashBalance = Math.max(0, netCashFlow);
-  const netWorth = cashBalance + portfolioValue + savingsValue - loansValue;
+  }, 0), [transactions]);
+  const cashBalance = useMemo(() => Math.max(0, netCashFlow), [netCashFlow]);
+  const netWorth = useMemo(() => cashBalance + portfolioValue + savingsValue - loansValue, [cashBalance, portfolioValue, savingsValue, loansValue]);
 
   // Monthly expense calculation
-  const currentMonthStr = new Date().toISOString().substring(0, 7); // YYYY-MM
-  const monthlyExpenses = transactions
+  const currentMonthStr = useMemo(() => new Date().toISOString().substring(0, 7), []); // YYYY-MM
+  const monthlyExpenses = useMemo(() => transactions
     .filter(t => t.type === "expense" && t.date.startsWith(currentMonthStr))
-    .reduce((sum, t) => sum + t.amount, 0);
+    .reduce((sum, t) => sum + t.amount, 0), [transactions, currentMonthStr]);
 
-  const summary = [
+  const summary = useMemo(() => [
     {
       title: "Net worth",
       value: formatCurrency(netWorth, user),
@@ -279,54 +281,59 @@ export function DashboardPage() {
       icon: Landmark,
       iconColor: "text-brand-cream bg-brand-cream/5 border-brand-cream/10",
     },
-  ];
+  ], [netWorth, monthlyExpenses, portfolioValue, loansValue, budgetData?.monthlyBudget, currentMonthStr, portfolio.length, loans.length, user]);
 
   // Spending Category chart data from transactions
-  const expenseCategories = {};
-  transactions
-    .filter(t => t.type === "expense")
-    .forEach(t => {
-      expenseCategories[t.category] = (expenseCategories[t.category] || 0) + t.amount;
-    });
+  const expenseCategories = useMemo(() => {
+    const categories = {};
+    transactions
+      .filter(t => t.type === "expense")
+      .forEach(t => {
+        categories[t.category] = (categories[t.category] || 0) + t.amount;
+      });
+    return categories;
+  }, [transactions]);
 
-  const spendingChartData = Object.entries(expenseCategories).map(([name, value]) => ({
+  const spendingChartData = useMemo(() => Object.entries(expenseCategories).map(([name, value]) => ({
     name,
     value: parseFloat(value.toFixed(2)),
-  })).slice(0, 6);
+  })).slice(0, 6), [expenseCategories]);
 
   // Fallback data
-  const finalSpendingData = spendingChartData.length > 0
+  const finalSpendingData = useMemo(() => spendingChartData.length > 0
     ? spendingChartData
     : [
-        { name: "Housing", value: 1500 },
-        { name: "Food", value: 450 },
-        { name: "Travel", value: 200 }
-      ];
+         { name: "Housing", value: 1500 },
+         { name: "Food", value: 450 },
+         { name: "Travel", value: 200 }
+      ], [spendingChartData]);
 
   // Allocations group by asset class
-  const classMap = {};
-  portfolio.forEach(a => {
-    classMap[a.assetType] = (classMap[a.assetType] || 0) + a.totalValue;
-  });
-  if (cashBalance > 0) classMap["Cash"] = (classMap["Cash"] || 0) + cashBalance;
-  if (savingsValue > 0) classMap["Savings"] = (classMap["Savings"] || 0) + savingsValue;
+  const allocations = useMemo(() => {
+    const classMap = {};
+    portfolio.forEach(a => {
+      classMap[a.assetType] = (classMap[a.assetType] || 0) + a.totalValue;
+    });
+    if (cashBalance > 0) classMap["Cash"] = (classMap["Cash"] || 0) + cashBalance;
+    if (savingsValue > 0) classMap["Savings"] = (classMap["Savings"] || 0) + savingsValue;
 
-  const totalAllocationSum = Object.values(classMap).reduce((sum, v) => sum + v, 0);
-  const allocations = Object.entries(classMap).map(([name, val]) => ({
-    name,
-    value: totalAllocationSum > 0 ? Math.round((val / totalAllocationSum) * 100) : 0,
-  })).filter(item => item.value > 0);
+    const totalAllocationSum = Object.values(classMap).reduce((sum, v) => sum + v, 0);
+    return Object.entries(classMap).map(([name, val]) => ({
+      name,
+      value: totalAllocationSum > 0 ? Math.round((val / totalAllocationSum) * 100) : 0,
+    })).filter(item => item.value > 0);
+  }, [portfolio, cashBalance, savingsValue]);
 
-  const finalAllocations = allocations.length > 0
+  const finalAllocations = useMemo(() => allocations.length > 0
     ? allocations
     : [
-        { name: "Cash", value: 40 },
-        { name: "Equities", value: 45 },
-        { name: "Bonds", value: 15 }
-      ];
+         { name: "Cash", value: 40 },
+         { name: "Equities", value: 45 },
+         { name: "Bonds", value: 15 }
+      ], [allocations]);
 
-  const isDataEmpty = transactions.length === 0 && portfolio.length === 0 && loans.length === 0 && savings.length === 0;
-  const showOnboarding = !isOnboardingDismissed && isDataEmpty;
+  const isDataEmpty = useMemo(() => transactions.length === 0 && portfolio.length === 0 && loans.length === 0 && savings.length === 0, [transactions, portfolio, loans, savings]);
+  const showOnboarding = useMemo(() => !isOnboardingDismissed && isDataEmpty, [isOnboardingDismissed, isDataEmpty]);
 
   return (
     <Shell>
@@ -973,22 +980,26 @@ export function DashboardPage() {
       </div>
 
       {/* Add Transaction Modal */}
-      <AddTransactionModal 
-        isOpen={isAddTxOpen} 
-        onClose={() => setIsAddTxOpen(false)} 
-        onSuccess={async (data) => {
-          await addTxMutation.mutateAsync(data);
-        }}
-      />
+      <Suspense fallback={null}>
+        <AddTransactionModal 
+          isOpen={isAddTxOpen} 
+          onClose={useCallback(() => setIsAddTxOpen(false), [])} 
+          onSuccess={useCallback(async (data) => {
+            await addTxMutation.mutateAsync(data);
+          }, [addTxMutation])}
+        />
+      </Suspense>
 
       {/* Add Savings Goal Modal */}
-      <AddSavingsGoalModal 
-        isOpen={isAddGoalOpen} 
-        onClose={() => setIsAddGoalOpen(false)} 
-        onSuccess={async (data) => {
-          await addGoalMutation.mutateAsync(data);
-        }}
-      />
+      <Suspense fallback={null}>
+        <AddSavingsGoalModal 
+          isOpen={isAddGoalOpen} 
+          onClose={useCallback(() => setIsAddGoalOpen(false), [])} 
+          onSuccess={useCallback(async (data) => {
+            await addGoalMutation.mutateAsync(data);
+          }, [addGoalMutation])}
+        />
+      </Suspense>
     </Shell>
   );
 }
