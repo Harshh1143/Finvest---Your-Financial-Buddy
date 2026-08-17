@@ -4,6 +4,15 @@ const AuthContext = createContext(undefined);
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+        const handleUnauthorized = () => {
+            setUser(null);
+        };
+        window.addEventListener("auth-unauthorized", handleUnauthorized);
+        return () => window.removeEventListener("auth-unauthorized", handleUnauthorized);
+    }, []);
+
     useEffect(() => {
         // Initial fetch of current user
         async function checkAuth() {

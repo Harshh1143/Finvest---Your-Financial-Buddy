@@ -196,9 +196,12 @@ export function PortfolioPage() {
     }
   }, [selectedTicker, assetsCatalog, user]);
 
+  // Calculations & Defensive Array Fallbacks
+  const safePortfolio = useMemo(() => Array.isArray(portfolio) ? portfolio : [], [portfolio]);
+
   // Calculations for total stats
-  const totalValue = useMemo(() => portfolio.reduce((sum, item) => sum + item.totalValue, 0), [portfolio]);
-  const totalCost = useMemo(() => portfolio.reduce((sum, item) => sum + item.totalCost, 0), [portfolio]);
+  const totalValue = useMemo(() => safePortfolio.reduce((sum, item) => sum + (item?.totalValue || 0), 0), [safePortfolio]);
+  const totalCost = useMemo(() => safePortfolio.reduce((sum, item) => sum + (item?.totalCost || 0), 0), [safePortfolio]);
   const totalPL = useMemo(() => totalValue - totalCost, [totalValue, totalCost]);
   const totalPLPercent = useMemo(() => (totalCost > 0 ? (totalPL / totalCost) * 100 : 0), [totalPL, totalCost]);
 
@@ -253,9 +256,10 @@ export function PortfolioPage() {
   }, [user, editingPrice, updatePriceMutation]);
 
   const handleAutoRefresh = useCallback(async () => {
-    if (!user?.id || portfolio.length === 0) return;
+    if (!user?.id || safePortfolio.length === 0) return;
     try {
-      const updates = portfolio.map((asset) => {
+      const updates = safePortfolio.map((asset) => {
+        if (!asset) return Promise.resolve();
         const volatility = (Math.random() * 4 - 1.8) / 100; // -1.8% to +2.2%
         const newPrice = parseFloat((asset.currentPrice * (1 + volatility)).toFixed(2));
         return db.portfolio.updatePrice(user.id, asset._id, newPrice);
@@ -267,7 +271,7 @@ export function PortfolioPage() {
       console.error("Failed to auto-refresh prices:", err);
       toast.error("Failed to synchronize market prices.");
     }
-  }, [user, portfolio, queryClient]);
+  }, [user, safePortfolio, queryClient]);
 
   if (isLoading) {
     return (
@@ -307,7 +311,7 @@ export function PortfolioPage() {
           <Button 
             id="auto-refresh-prices-btn"
             onClick={handleAutoRefresh} 
-            disabled={portfolio.length === 0} 
+            disabled={safePortfolio.length === 0} 
             variant="secondary"
             className="w-fit py-5 px-6 rounded-lg font-bold transition shadow-lg shadow-brand-cobalt/5 border border-brand-cream/10"
           >
@@ -523,7 +527,7 @@ export function PortfolioPage() {
         </div>
 
         {/* Portfolio Overview & Performance */}
-        {portfolio.length > 0 && (
+        {safePortfolio.length > 0 && (
           <div className="mt-12 space-y-10 relative z-10">
             {/* KPI Section */}
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -657,8 +661,9 @@ export function PortfolioPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-brand-cream/5 bg-brand-midnight-card/25">
-                    {portfolio.map((asset) => {
-                      const isLoss = asset.unrealizedPL < 0;
+                    {safePortfolio.map((asset) => {
+                      if (!asset) return null;
+                      const isLoss = (asset.unrealizedPL || 0) < 0;
                       const isEditing = editingAssetId === asset._id;
                       return (
                         <tr key={asset._id} className="hover:bg-brand-cream/5 transition-colors duration-200">

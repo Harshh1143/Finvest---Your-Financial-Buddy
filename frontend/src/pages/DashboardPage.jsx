@@ -210,39 +210,31 @@ export function DashboardPage() {
     },
   });
 
-  if (isTxLoading || isPortfolioLoading || isLoansLoading || isSavingsLoading || isBudgetLoading) {
-    return (
-      <Shell>
-        <div className="flex h-[60vh] items-center justify-center relative">
-          <div className="absolute w-60 h-60 rounded-full bg-brand-cobalt/5 blur-[100px] animate-pulse" />
-          <div className="flex flex-col items-center gap-3 z-10">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-brand-cobalt border-t-transparent" />
-            <span className="text-xs font-semibold tracking-[0.25em] text-brand-silver uppercase mt-4">
-              Loading financial state...
-            </span>
-          </div>
-        </div>
-      </Shell>
-    );
-  }
 
-  // Calculations
-  const portfolioValue = useMemo(() => portfolio.reduce((sum, item) => sum + item.totalValue, 0), [portfolio]);
-  const savingsValue = useMemo(() => savings.reduce((sum, item) => sum + item.currentAmount, 0), [savings]);
-  const loansValue = useMemo(() => loans.reduce((sum, item) => sum + item.remaining, 0), [loans]);
+
+  // Calculations & Defensive Array Fallbacks
+  const safeTransactions = useMemo(() => Array.isArray(transactions) ? transactions : [], [transactions]);
+  const safePortfolio = useMemo(() => Array.isArray(portfolio) ? portfolio : [], [portfolio]);
+  const safeLoans = useMemo(() => Array.isArray(loans) ? loans : [], [loans]);
+  const safeSavings = useMemo(() => Array.isArray(savings) ? savings : [], [savings]);
+
+  const portfolioValue = useMemo(() => safePortfolio.reduce((sum, item) => sum + (item?.totalValue || 0), 0), [safePortfolio]);
+  const savingsValue = useMemo(() => safeSavings.reduce((sum, item) => sum + (item?.currentAmount || 0), 0), [safeSavings]);
+  const loansValue = useMemo(() => safeLoans.reduce((sum, item) => sum + (item?.remaining || 0), 0), [safeLoans]);
 
   // Cash Balance: income - expenses
-  const netCashFlow = useMemo(() => transactions.reduce((sum, t) => {
-    return t.type === "income" ? sum + t.amount : sum - t.amount;
-  }, 0), [transactions]);
+  const netCashFlow = useMemo(() => safeTransactions.reduce((sum, t) => {
+    if (!t) return sum;
+    return t.type === "income" ? sum + (t.amount || 0) : sum - (t.amount || 0);
+  }, 0), [safeTransactions]);
   const cashBalance = useMemo(() => Math.max(0, netCashFlow), [netCashFlow]);
   const netWorth = useMemo(() => cashBalance + portfolioValue + savingsValue - loansValue, [cashBalance, portfolioValue, savingsValue, loansValue]);
 
   // Monthly expense calculation
   const currentMonthStr = useMemo(() => new Date().toISOString().substring(0, 7), []); // YYYY-MM
-  const monthlyExpenses = useMemo(() => transactions
-    .filter(t => t.type === "expense" && t.date.startsWith(currentMonthStr))
-    .reduce((sum, t) => sum + t.amount, 0), [transactions, currentMonthStr]);
+  const monthlyExpenses = useMemo(() => safeTransactions
+    .filter(t => t && t.type === "expense" && t.date && typeof t.date === "string" && t.date.startsWith(currentMonthStr))
+    .reduce((sum, t) => sum + (t.amount || 0), 0), [safeTransactions, currentMonthStr]);
 
   const summary = useMemo(() => [
     {
@@ -267,7 +259,7 @@ export function DashboardPage() {
       title: "Investments",
       value: formatCurrency(portfolioValue, user),
       change: "+8.9%",
-      detail: `${portfolio.length} active holdings`,
+      detail: `${safePortfolio.length} active holdings`,
       type: "investments",
       icon: TrendingUp,
       iconColor: "text-brand-cream bg-brand-cobalt/10 border-brand-cobalt/20",
@@ -276,23 +268,23 @@ export function DashboardPage() {
       title: "Total Liabilities",
       value: formatCurrency(loansValue, user),
       change: "-1.8%",
-      detail: `${loans.length} active debts`,
+      detail: `${safeLoans.length} active debts`,
       type: "liabilities",
       icon: Landmark,
       iconColor: "text-brand-cream bg-brand-cream/5 border-brand-cream/10",
     },
-  ], [netWorth, monthlyExpenses, portfolioValue, loansValue, budgetData?.monthlyBudget, currentMonthStr, portfolio.length, loans.length, user]);
+  ], [netWorth, monthlyExpenses, portfolioValue, loansValue, budgetData?.monthlyBudget, currentMonthStr, safePortfolio.length, safeLoans.length, user]);
 
   // Spending Category chart data from transactions
   const expenseCategories = useMemo(() => {
     const categories = {};
-    transactions
-      .filter(t => t.type === "expense")
+    safeTransactions
+      .filter(t => t && t.type === "expense" && t.category)
       .forEach(t => {
-        categories[t.category] = (categories[t.category] || 0) + t.amount;
+        categories[t.category] = (categories[t.category] || 0) + (t.amount || 0);
       });
     return categories;
-  }, [transactions]);
+  }, [safeTransactions]);
 
   const spendingChartData = useMemo(() => Object.entries(expenseCategories).map(([name, value]) => ({
     name,
@@ -311,8 +303,10 @@ export function DashboardPage() {
   // Allocations group by asset class
   const allocations = useMemo(() => {
     const classMap = {};
-    portfolio.forEach(a => {
-      classMap[a.assetType] = (classMap[a.assetType] || 0) + a.totalValue;
+    safePortfolio.forEach(a => {
+      if (a && a.assetType) {
+        classMap[a.assetType] = (classMap[a.assetType] || 0) + (a.totalValue || 0);
+      }
     });
     if (cashBalance > 0) classMap["Cash"] = (classMap["Cash"] || 0) + cashBalance;
     if (savingsValue > 0) classMap["Savings"] = (classMap["Savings"] || 0) + savingsValue;
@@ -322,7 +316,7 @@ export function DashboardPage() {
       name,
       value: totalAllocationSum > 0 ? Math.round((val / totalAllocationSum) * 100) : 0,
     })).filter(item => item.value > 0);
-  }, [portfolio, cashBalance, savingsValue]);
+  }, [safePortfolio, cashBalance, savingsValue]);
 
   const finalAllocations = useMemo(() => allocations.length > 0
     ? allocations
@@ -332,8 +326,34 @@ export function DashboardPage() {
          { name: "Bonds", value: 15 }
       ], [allocations]);
 
-  const isDataEmpty = useMemo(() => transactions.length === 0 && portfolio.length === 0 && loans.length === 0 && savings.length === 0, [transactions, portfolio, loans, savings]);
+  const isDataEmpty = useMemo(() => safeTransactions.length === 0 && safePortfolio.length === 0 && safeLoans.length === 0 && safeSavings.length === 0, [safeTransactions, safePortfolio, safeLoans, safeSavings]);
   const showOnboarding = useMemo(() => !isOnboardingDismissed && isDataEmpty, [isOnboardingDismissed, isDataEmpty]);
+
+  const handleAddTxClose = useCallback(() => setIsAddTxOpen(false), []);
+  const handleAddTxSuccess = useCallback(async (data) => {
+    await addTxMutation.mutateAsync(data);
+  }, [addTxMutation]);
+
+  const handleAddGoalClose = useCallback(() => setIsAddGoalOpen(false), []);
+  const handleAddGoalSuccess = useCallback(async (data) => {
+    await addGoalMutation.mutateAsync(data);
+  }, [addGoalMutation]);
+
+  if (isTxLoading || isPortfolioLoading || isLoansLoading || isSavingsLoading || isBudgetLoading) {
+    return (
+      <Shell>
+        <div className="flex h-[60vh] items-center justify-center relative">
+          <div className="absolute w-60 h-60 rounded-full bg-brand-cobalt/5 blur-[100px] animate-pulse" />
+          <div className="flex flex-col items-center gap-3 z-10">
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-brand-cobalt border-t-transparent" />
+            <span className="text-xs font-semibold tracking-[0.25em] text-brand-silver uppercase mt-4">
+              Loading financial state...
+            </span>
+          </div>
+        </div>
+      </Shell>
+    );
+  }
 
   return (
     <Shell>
@@ -799,13 +819,14 @@ export function DashboardPage() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="space-y-3">
-                {transactions.length > 0 ? (
-                  transactions.slice(0, 5).map((tx) => {
-                    const CategoryIcon = getCategoryIcon(tx.category);
-                    const tagStyle = getCategoryColor(tx.category, tx.type);
+                {safeTransactions.length > 0 ? (
+                  safeTransactions.slice(0, 5).map((tx) => {
+                    if (!tx) return null;
+                    const CategoryIcon = getCategoryIcon(tx.category || "");
+                    const tagStyle = getCategoryColor(tx.category || "", tx.type || "");
                     return (
                       <div 
-                        key={tx._id} 
+                        key={tx._id || Math.random().toString()} 
                         className="flex items-center justify-between rounded-xl border border-brand-cream/5 bg-brand-cream/5 px-4 py-3.5 hover:border-brand-cobalt/25 hover:bg-brand-cream/10 transition duration-200"
                       >
                         <div className="flex items-center gap-3.5">
@@ -814,15 +835,15 @@ export function DashboardPage() {
                           </div>
                           <div>
                             <p className="font-semibold text-xs text-brand-cream">
-                              {tx.description}
+                              {tx.description || "Untitled Transaction"}
                             </p>
                             <p className="text-[10px] font-medium text-brand-silver mt-0.5">
-                              {tx.category} · {tx.date}
+                              {tx.category || "General"} · {tx.date ? new Date(tx.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : "N/A"}
                             </p>
                           </div>
                         </div>
                         <p className={`font-bold text-xs font-mono ${tx.type === "income" ? "text-brand-cobalt-light" : "text-brand-cream"}`}>
-                          {tx.type === "income" ? "+" : "-"}{formatCurrency(tx.amount, user)}
+                          {tx.type === "income" ? "+" : "-"}{formatCurrency(tx.amount || 0, user)}
                         </p>
                       </div>
                     );
@@ -855,13 +876,14 @@ export function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="p-0 space-y-4">
-              {savings.length > 0 ? (
-                savings.map((goal) => {
+              {safeSavings.length > 0 ? (
+                safeSavings.map((goal) => {
+                  if (!goal) return null;
                   const percent = goal.targetAmount > 0 ? Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100)) : 0;
                   const isAchieved = goal.currentAmount >= goal.targetAmount;
                   return (
                     <div 
-                      key={goal._id} 
+                      key={goal._id || Math.random().toString()} 
                       className="rounded-xl border border-brand-cream/5 bg-brand-cream/5 p-4 space-y-4 relative group/goal"
                     >
                       <div className="flex items-start justify-between">
@@ -870,9 +892,9 @@ export function DashboardPage() {
                             <PiggyBank className="h-4.5 w-4.5" />
                           </div>
                           <div>
-                            <p className="font-bold text-xs text-brand-cream">{goal.name}</p>
+                            <p className="font-bold text-xs text-brand-cream">{goal.name || "Untitled Goal"}</p>
                             <p className="text-[10px] font-medium text-brand-silver mt-0.5">
-                              {goal.category} · Target: {new Date(goal.targetDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                              {goal.category || "General"} · Target: {goal.targetDate ? new Date(goal.targetDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "N/A"}
                             </p>
                           </div>
                         </div>
@@ -983,10 +1005,8 @@ export function DashboardPage() {
       <Suspense fallback={null}>
         <AddTransactionModal 
           isOpen={isAddTxOpen} 
-          onClose={useCallback(() => setIsAddTxOpen(false), [])} 
-          onSuccess={useCallback(async (data) => {
-            await addTxMutation.mutateAsync(data);
-          }, [addTxMutation])}
+          onClose={handleAddTxClose} 
+          onSuccess={handleAddTxSuccess}
         />
       </Suspense>
 
@@ -994,10 +1014,8 @@ export function DashboardPage() {
       <Suspense fallback={null}>
         <AddSavingsGoalModal 
           isOpen={isAddGoalOpen} 
-          onClose={useCallback(() => setIsAddGoalOpen(false), [])} 
-          onSuccess={useCallback(async (data) => {
-            await addGoalMutation.mutateAsync(data);
-          }, [addGoalMutation])}
+          onClose={handleAddGoalClose} 
+          onSuccess={handleAddGoalSuccess}
         />
       </Suspense>
     </Shell>

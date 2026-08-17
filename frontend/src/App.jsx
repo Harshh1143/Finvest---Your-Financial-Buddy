@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { Toaster } from "sonner";
 import { LoadingScreen } from "./components/ui/LoadingScreen";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 
 // Lazy loaded page components
 const HomePage = lazy(() => import("./pages/HomePage").then((m) => ({ default: m.HomePage })));
@@ -14,25 +15,27 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage").then((m) => ({ defa
 function App() {
     return (<>
       <Toaster position="top-right" theme="dark" richColors closeButton/>
-      <BrowserRouter>
-        <Suspense fallback={<LoadingScreen />}>
-          <Routes>
-            <Route path="/" element={<HomePage />}/>
-            <Route path="/dashboard" element={<ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>}/>
-            <Route path="/portfolio" element={<ProtectedRoute>
-                  <PortfolioPage />
-                </ProtectedRoute>}/>
-            <Route path="/loans" element={<ProtectedRoute>
-                  <LoansPage />
-                </ProtectedRoute>}/>
-            <Route path="/profile" element={<ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>}/>
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <Suspense fallback={<LoadingScreen />}>
+            <Routes>
+              <Route path="/" element={<HomePage />}/>
+              <Route path="/dashboard" element={<ProtectedRoute>
+                    <DashboardPage />
+                  </ProtectedRoute>}/>
+              <Route path="/portfolio" element={<ProtectedRoute>
+                    <PortfolioPage />
+                  </ProtectedRoute>}/>
+              <Route path="/loans" element={<ProtectedRoute>
+                    <LoansPage />
+                  </ProtectedRoute>}/>
+              <Route path="/profile" element={<ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>}/>
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </ErrorBoundary>
     </>);
 }
 export default App;

@@ -108,22 +108,24 @@ export function LoansPage() {
         }
     });
 
-    // Calculations
-    const totalPrincipal = useMemo(() => loans.reduce((sum, l) => sum + l.principal, 0), [loans]);
-    const totalRemaining = useMemo(() => loans.reduce((sum, l) => sum + l.remaining, 0), [loans]);
-    const totalInterestPaid = useMemo(() => loans.reduce((sum, l) => sum + l.interestPaid, 0), [loans]);
-    const totalPaid = useMemo(() => loans.reduce((sum, l) => sum + l.totalPaid, 0), [loans]);
-    const totalMonthlyEMI = useMemo(() => loans.reduce((sum, l) => l.remaining > 0 ? sum + l.monthlyEMI : sum, 0), [loans]);
+    // Calculations & Defensive Array Fallbacks
+    const safeLoans = useMemo(() => Array.isArray(loans) ? loans : [], [loans]);
+
+    const totalPrincipal = useMemo(() => safeLoans.reduce((sum, l) => sum + (l?.principal || 0), 0), [safeLoans]);
+    const totalRemaining = useMemo(() => safeLoans.reduce((sum, l) => sum + (l?.remaining || 0), 0), [safeLoans]);
+    const totalInterestPaid = useMemo(() => safeLoans.reduce((sum, l) => sum + (l?.interestPaid || 0), 0), [safeLoans]);
+    const totalPaid = useMemo(() => safeLoans.reduce((sum, l) => sum + (l?.totalPaid || 0), 0), [safeLoans]);
+    const totalMonthlyEMI = useMemo(() => safeLoans.reduce((sum, l) => (l && l.remaining > 0) ? sum + (l.monthlyEMI || 0) : sum, 0), [safeLoans]);
 
     const nextDueDate = useMemo(() => {
-        const activeLoans = loans.filter((l) => l.remaining > 0 && l.nextPaymentDate);
+        const activeLoans = safeLoans.filter((l) => l && l.remaining > 0 && l.nextPaymentDate);
         if (activeLoans.length === 0)
             return null;
         const sorted = [...activeLoans].sort((a, b) => {
             return new Date(a.nextPaymentDate).getTime() - new Date(b.nextPaymentDate).getTime();
         });
         return sorted[0].nextPaymentDate;
-    }, [loans]);
+    }, [safeLoans]);
 
     const formatNextDue = (dateStr) => {
         if (!dateStr)
@@ -139,9 +141,9 @@ export function LoansPage() {
         for (let i = 0; i < 6; i++) {
             const d = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
             const monthName = months[d.getMonth()];
-            const amount = loans.reduce((sum, loan) => {
-                if (loan.remaining > 0) {
-                    return sum + loan.monthlyEMI;
+            const amount = safeLoans.reduce((sum, loan) => {
+                if (loan && loan.remaining > 0) {
+                    return sum + (loan.monthlyEMI || 0);
                 }
                 return sum;
             }, 0);
@@ -151,12 +153,17 @@ export function LoansPage() {
             });
         }
         return result;
-    }, [loans]);
+    }, [safeLoans]);
 
     const handlePayEMI = useCallback(async (loanId) => {
         const extra = parseFloat(extraPayment) || 0;
         await payEMIMutation.mutateAsync({ loanId, extraPayment: extra });
     }, [extraPayment, payEMIMutation]);
+
+    const handleAddLoanClose = useCallback(() => setIsAddLoanOpen(false), []);
+    const handleAddLoanSuccess = useCallback(async (data) => {
+        await addLoanMutation.mutateAsync(data);
+    }, [addLoanMutation]);
 
     if (isLoading) {
         return (
@@ -263,7 +270,7 @@ export function LoansPage() {
                 )}
 
                 {/* Main Content Area */}
-                {loans.length === 0 ? (
+                {safeLoans.length === 0 ? (
                     <div className="mt-12 rounded-2xl border border-brand-cream/5 bg-brand-midnight-card/75 p-16 text-center relative overflow-hidden">
                         <Landmark className="mx-auto h-12 w-12 text-brand-silver animate-pulse" />
                         <h3 className="mt-6 text-lg font-bold text-brand-cream">No active loans</h3>
@@ -280,7 +287,8 @@ export function LoansPage() {
                 ) : (
                     <>
                         <div className="mt-10 grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 relative z-10">
-                            {loans.map((loan) => {
+                            {safeLoans.map((loan) => {
+                                if (!loan) return null;
                                 const payoffProgress = loan.principal > 0 ? ((loan.principal - loan.remaining) / loan.principal) * 100 : 0;
                                 return (
                                     <motion.div 
@@ -531,10 +539,8 @@ export function LoansPage() {
             <Suspense fallback={null}>
                 <AddLoanModal 
                     isOpen={isAddLoanOpen} 
-                    onClose={useCallback(() => setIsAddLoanOpen(false), [])} 
-                    onSuccess={useCallback(async (data) => {
-                        await addLoanMutation.mutateAsync(data);
-                    }, [addLoanMutation])}
+                    onClose={handleAddLoanClose} 
+                    onSuccess={handleAddLoanSuccess}
                 />
             </Suspense>
         </Shell>

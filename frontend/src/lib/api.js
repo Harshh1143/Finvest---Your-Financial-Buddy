@@ -22,6 +22,18 @@ api.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
+// Interceptor to handle global 401 Unauthorized responses
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('finvest_token');
+      window.dispatchEvent(new Event('auth-unauthorized'));
+    }
+    return Promise.reject(error);
+  }
+);
+
 const request = async (endpoint, options = {}) => {
   const { method = 'GET', body, headers = {} } = options;
   try {
