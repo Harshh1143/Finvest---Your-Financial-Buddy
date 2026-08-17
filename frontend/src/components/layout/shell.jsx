@@ -26,7 +26,8 @@ export function Shell({ children }) {
     return (
         <div className="min-h-screen bg-brand-midnight text-brand-cream font-sans flex flex-col justify-between selection:bg-brand-cobalt/40">
             {/* Header Navigation */}
-            <header className="w-full max-w-7xl mx-auto px-6 h-18 lg:px-8 flex items-center justify-between z-50 border-b border-brand-cream/5 relative">
+            <header className="sticky top-0 z-50 w-full bg-brand-midnight border-b border-brand-cream/5">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[4.5rem] flex items-center justify-between">
                 <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-3 text-sm font-bold tracking-[0.25em] text-brand-cream uppercase hover:opacity-90 transition">
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-cobalt/40 bg-brand-cobalt/10 shadow-[0_4px_16px_rgba(43,92,184,0.15)]">
                         <Landmark className="h-4.5 w-4.5 text-brand-cobalt-light"/>
@@ -139,11 +140,12 @@ export function Shell({ children }) {
                         </div>
                     )}
                 </div>
+            </div>
             </header>
 
             {/* Mobile Navigation Drawer for Landing Page */}
             {!isAppView && isMobileMenuOpen && (
-                <div className="md:hidden fixed inset-x-0 top-18 bg-brand-midnight/95 backdrop-blur-xl border-b border-brand-cream/10 z-40 p-6 flex flex-col gap-6 animate-in fade-in slide-in-from-top duration-200 shadow-2xl">
+                <div className="md:hidden fixed inset-x-0 top-[4.5rem] bg-brand-midnight/98 backdrop-blur-xl border-b border-brand-cream/10 z-50 p-6 flex flex-col gap-6 shadow-2xl">
                     <nav className="flex flex-col gap-4 text-sm font-medium tracking-wide">
                         {navItems.map((item) => (
                             <a 
